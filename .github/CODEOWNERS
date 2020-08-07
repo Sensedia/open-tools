@@ -1,0 +1,5 @@
+# These owners will be the default owners for everything in
+# repository. Unless further correspondence takes precedence,
+# The following users will be asked for review when someone opens a pull request.
+*       @Sensedia/cloud-architecture
+

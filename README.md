@@ -15,6 +15,7 @@ Repository with tools, charts, scripts and others developed by Sensedia and shar
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── README.md
-└── scripts
-    └── listK8sHardwareResources.sh
+├── rutil # command line for redis backup/restore
+├── scripts # scripts gerais
+└── tutorials # miscellaneous tutorials
 ```

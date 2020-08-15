@@ -49,7 +49,13 @@ Install Docker following the instructions in [this tutorial](../tutorials/instal
 Generate new image with command:
 
 ```bash
-docker build -t rutil .
+make image
+```
+
+Or:
+
+```bash
+docker build -t rutil:latest .
 ```
 
 List the Docker images:
@@ -61,14 +67,22 @@ docker images
 Run a container:
 
 ```bash
-docker run --rm --name rutil rutil --help
+docker run --rm rutil --help
 ```
+
+More information about ``docker run`` command: https://docs.docker.com/engine/reference/run/
 
 ## Compiling with go
 
 Install Go following the instructions in [this tutorial](../tutorials/install_go.md).
 
 Compile ``rutil`` with Go:
+
+```bash
+make build
+```
+
+Or:
 
 ```bash
 go build -o bin/rutil .
@@ -113,6 +127,34 @@ rutil dump [command options] [arguments...]
 --auto, -a      make up a file name for the dump - redisYYYYMMDDHHMMSS.rdmp
 ```
 
+Make a dump of all keys of Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 dump /tmp/dump_all_keys.rdmp
+```
+
+A file will be created ``/tmp/dump_all_keys.rdmp``.
+
+Or:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 dump -a
+```
+
+A file will be created in the current directory with the following pattern: ``redisYYYYMMDDHHMMSS.rdmp``.
+
+Using Docker:
+
+```bash
+docker run --rm -v $PWD:/tmp rutil --host 192.168.0.1 --port 6379 dump /tmp/file2.rdmp
+```
+
+Or:
+
+```bash
+docker run --rm -v $PWD:/tmp rutil --host 192.168.0.1 --port 6379 dump -a
+```
+
 ## Pipe
 
 ```bash
@@ -134,6 +176,30 @@ rutil restore [command options] [arguments...]
 --ignore, -g    ignore BUSYKEY restore errors
 ```
 
+Simulate restore all keys of Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 restore --dry-run /tmp/file2.rdmp
+```
+
+Or:
+
+```bash
+docker run --rm -v $PWD:/tmp rutil --host 192.168.0.1 --port 6379 restore --dry-run /tmp/file2.rdmp
+```
+
+Restore all keys of Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 restore --flushdb /tmp/file2.rdmp
+```
+
+Or:
+
+```bash
+docker run --rm -v $PWD:/tmp rutil --host 192.168.0.1 --port 6379 restore --flushdb /tmp/file2.rdmp
+```
+
 ## Query
 
 ```bash
@@ -147,3 +213,53 @@ rutil query [command options] [arguments...]
 --field, -f [-f option --f option]   hash fields to print (default all)
 --json, -j                           attempt to parse and pretty print strings as json
 ```
+
+List all keys in Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 query --keys '*'
+```
+
+Or:
+
+```bash
+docker run --rm rutil --host 192.168.0.1 --port 6379 query --keys '*'
+```
+
+Make a query in Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK*'
+```
+
+Or:
+
+```bash
+docker run --rm rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK*'
+```
+
+Delete a key in Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK:55' --delete
+```
+
+Or:
+
+```bash
+docker run --rm rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK:55' --delete
+```
+
+Print value of a key in Redis:
+
+```bash
+./bin/rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK:55' --print
+```
+
+Or:
+
+```bash
+docker run --rm rutil --host 192.168.0.1 --port 6379 query --keys 'testing:abcde:BOOK:55' --print
+```
+
+More information: https://redis.io/commands/keys

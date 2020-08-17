@@ -19,7 +19,7 @@
 ``rutil`` is a small command line utility that lets you selectively dump, restore and query a redis database, peek into stored data and pretty print json contents.
 
 > Attention!!! This code is a fork of project [``rutil``](https://github.com/pampa/rutil)
-> We will try to contact the initial developers of the project and open a PR. Parallel to this, improvements were made to the code to be compiled with [Go](https://golang.org/) 1.15 and a Docker image was created to facilitate distribution and use.
+> We try to contact the initial developers: https://github.com/pampa/rutil/issues/6. Parallel to this, improvements were made to the code to be compiled with [Go](https://golang.org/) 1.15 and a Docker image was created to facilitate distribution and use.
 
 Credits for:
 

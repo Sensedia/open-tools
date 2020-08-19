@@ -36,7 +36,7 @@ type FileHeader struct {
 
 func (r *rutil) Cluster() *cluster.Cluster {
 	if r.cluster == nil {
-		cluster, err := cluster.New("")
+		cluster, err := cluster.New(fmt.Sprintf("%s:%d", r.Host, r.Port))
 		checkErr(err, "CONNECT "+fmt.Sprintf("%s:%d"))
 
 		if r.Auth != "" {

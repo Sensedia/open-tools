@@ -14,7 +14,7 @@ var r rutil
 func main() {
 	app := cli.NewApp()
 	app.Usage = "a collection of command line redis utils"
-	app.Version = "0.1.2"
+	app.Version = "0.2.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "host, s",
@@ -30,12 +30,17 @@ func main() {
 			Value: 6379,
 			Usage: "redis port",
 		},
+		cli.BoolFlag{
+			Name:  "cluster, c",
+			Usage: "redis cluster connection",
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
 		r.Host = c.GlobalString("host")
 		r.Port = c.GlobalInt("port")
 		r.Auth = c.GlobalString("auth")
+		r.isCluster = c.GlobalBool("cluster")
 		return nil
 	}
 

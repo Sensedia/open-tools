@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"github.com/mediocregopher/radix.v2/cluster"
 	"github.com/mediocregopher/radix.v2/redis"
 	"io"
 	"os"
@@ -11,10 +12,12 @@ import (
 )
 
 type rutil struct {
-	Host string
-	Port int
-	Auth string
-	cli  *redis.Client
+	Host      string
+	Port      int
+	Auth      string
+	isCluster bool
+	cli       *redis.Client
+	cluster   *cluster.Cluster
 }
 
 type KeyDump struct {
@@ -31,6 +34,20 @@ type FileHeader struct {
 	Keys    uint64
 }
 
+func (r *rutil) Cluster() *cluster.Cluster {
+	if r.cluster == nil {
+		cluster, err := cluster.New("")
+		checkErr(err, "CONNECT "+fmt.Sprintf("%s:%d"))
+
+		if r.Auth != "" {
+			res := cluster.Cmd("AUTH", r.Auth)
+			checkErr(res.Err, "AUTH")
+		}
+		r.cluster = cluster
+	}
+	return r.cluster
+}
+
 func (r *rutil) Client() *redis.Client {
 	if r.cli == nil {
 		cli, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", r.Host, r.Port))
@@ -45,7 +62,13 @@ func (r *rutil) Client() *redis.Client {
 }
 
 func (r *rutil) getKeys(wcard string, regex string, invert bool) ([]string, int) {
-	res := r.Client().Cmd("KEYS", wcard)
+	var res *redis.Resp
+	if r.isCluster {
+		res = r.Cluster().Cmd("KEYS", wcard)
+	} else {
+		res = r.Client().Cmd("KEYS", wcard)
+	}
+
 	checkErr(res.Err, "KEYS "+wcard)
 	l, err := res.List()
 	checkErr(err, "KEYS "+wcard+" res.List()")
@@ -77,8 +100,14 @@ func (r *rutil) dumpKey(k string) (bool, KeyDump) {
 		KeyL: uint64(len(k)),
 	}
 	var err interface{}
-	cli := r.Client()
-	res := cli.Cmd("PTTL", k)
+
+	var res *redis.Resp
+	if r.isCluster {
+		res = r.Cluster().Cmd("PTTL", k)
+	} else {
+		res = r.Client().Cmd("PTTL", k)
+	}
+
 	checkErr(res.Err, "PTTL "+k)
 	d.Pttl, err = res.Int64()
 	if d.Pttl == -2 {
@@ -89,7 +118,12 @@ func (r *rutil) dumpKey(k string) (bool, KeyDump) {
 	}
 	checkErr(err, "PTTL "+k+" res.Int64()")
 
-	res = cli.Cmd("DUMP", k)
+	if r.isCluster {
+		res = r.Cluster().Cmd("DUMP", k)
+	} else {
+		res = r.Client().Cmd("DUMP", k)
+	}
+
 	checkErr(res.Err, "DUMP "+k)
 	d.Dump, err = res.Bytes()
 	checkErr(err, "DUMP "+k+" res.Bytes()")
@@ -150,15 +184,24 @@ func (r *rutil) readDump(f io.Reader) (bool, KeyDump) {
 }
 
 func (r *rutil) restoreKey(d KeyDump, del bool, ignor bool) int {
-	cli := r.Client()
 	var res *redis.Resp
 
 	if del {
-		res = cli.Cmd("DEL", d.Key)
+		if r.isCluster {
+			res = r.Cluster().Cmd("DEL", d.Key)
+		} else {
+			res = r.Client().Cmd("DEL", d.Key)
+		}
+
 		checkErr(res.Err, "DEL "+string(d.Key))
 	}
 
-	res = cli.Cmd("RESTORE", d.Key, d.Pttl, d.Dump)
+	if r.isCluster {
+		res = r.Cluster().Cmd("RESTORE", d.Key, d.Pttl, d.Dump)
+	} else {
+		res = r.Client().Cmd("RESTORE", d.Key, d.Pttl, d.Dump)
+	}
+
 	if ignor == true {
 		if res.Err != nil {
 			return 0
@@ -172,10 +215,14 @@ func (r *rutil) restoreKey(d KeyDump, del bool, ignor bool) int {
 }
 
 func (r *rutil) printKey(key string, fld []string, json bool) {
-	cli := r.Client()
 	var res *redis.Resp
 
-	res = cli.Cmd("TYPE", key)
+	if r.isCluster {
+		res = r.Cluster().Cmd("TYPE", key)
+	} else {
+		res = r.Client().Cmd("TYPE", key)
+	}
+
 	checkErr(res.Err, "TYPE "+key)
 	key_t, err := res.Str()
 	checkErr(err, "TYPE "+key+" res.Str()")
@@ -183,20 +230,32 @@ func (r *rutil) printKey(key string, fld []string, json bool) {
 	fmt.Printf("KEY: %s\nTYP: %s\n", key, key_t)
 	switch key_t {
 	case "set":
-		res = cli.Cmd("SMEMBERS", key)
+		if r.isCluster {
+			res = r.Cluster().Cmd("SMEMBERS", key)
+		} else {
+			res = r.Client().Cmd("SMEMBERS", key)
+		}
 		checkErr(res.Err, "SMEMBERS"+key)
 		set, err := res.List()
 		checkErr(err, "SMEMBERS "+key+" res.List()")
 		fmt.Println("VAL:", set, "\n")
 	case "hash":
 		if len(fld) == 0 {
-			res = cli.Cmd("HGETALL", key)
+			if r.isCluster {
+				res = r.Cluster().Cmd("HGETALL", key)
+			} else {
+				res = r.Client().Cmd("HGETALL", key)
+			}
 			checkErr(res.Err, "HGETALL "+key)
 			hash, err := res.Map()
 			checkErr(err, "HGETALL "+key+" res.Map()")
 			ppHash(hash, json)
 		} else {
-			res = cli.Cmd("HMGET", key, fld)
+			if r.isCluster {
+				res = r.Cluster().Cmd("HMGET", key, fld)
+			} else {
+				res = r.Client().Cmd("HMGET", key, fld)
+			}
 			checkErr(res.Err, "HMGET "+key)
 			arr, err := res.List()
 			checkErr(err, "HMGET "+key+" res.List()")
@@ -207,19 +266,31 @@ func (r *rutil) printKey(key string, fld []string, json bool) {
 			ppHash(hash, json)
 		}
 	case "string":
-		res = cli.Cmd("GET", key)
+		if r.isCluster {
+			res = r.Cluster().Cmd("GET", key)
+		} else {
+			res = r.Client().Cmd("GET", key)
+		}
 		checkErr(res.Err, "GET "+key)
 		str, err := res.Str()
 		checkErr(err, "GET "+key+" res.Str()")
 		ppString(str, json)
 	case "zset":
-		res = cli.Cmd("ZRANGE", key, 0, -1)
+		if r.isCluster {
+			res = r.Cluster().Cmd("ZRANGE", key, 0, -1)
+		} else {
+			res = r.Client().Cmd("ZRANGE", key, 0, -1)
+		}
 		checkErr(res.Err, "ZRANGE "+key)
 		set, err := res.List()
 		checkErr(err, "ZRANGE "+key+" res.List()")
 		fmt.Println("VAL:", set, "\n")
 	case "list":
-		res = cli.Cmd("LRANGE", key, 0, -1)
+		if r.isCluster {
+			res = r.Cluster().Cmd("LRANGE", key, 0, -1)
+		} else {
+			res = r.Client().Cmd("LRANGE", key, 0, -1)
+		}
 		checkErr(res.Err, "LRANGE "+key)
 		list, err := res.List()
 		checkErr(err, "LRANGE "+key+" res.List()")
@@ -245,7 +316,6 @@ func ppString(s string, j bool) {
 }
 
 func ppHash(h map[string]string, j bool) {
-
 	hh := make(map[string]interface{})
 	for k, v := range h {
 		if j {

@@ -10,6 +10,7 @@
 #   https://cloud.google.com/sdk/gcloud/reference/container/images/add-tag
 #   https://cloud.google.com/sdk/gcloud/reference/container/images/list
 #   https://cloud.google.com/sdk/gcloud/reference/container/images/list-tags
+#   https://stackoverflow.com/questions/8063228/how-do-i-check-if-a-variable-exists-in-a-list-in-bash
 #
 #--------------------- REQUISITES --------------------#
 #  1) Install packages: docker gcloud

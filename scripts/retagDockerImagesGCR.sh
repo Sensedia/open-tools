@@ -42,6 +42,7 @@ exit 3
 #
 # Example:
 # checkCommand git kubectl helm
+#
 function checkCommand() {
 
 local commands="$@"
@@ -64,6 +65,7 @@ done
 #
 # Example:
 # checkVariable "variable1" "value1"
+#
 function checkVariable() {
 
 local variable_name="$1"; 
@@ -71,13 +73,31 @@ local value="$2";
 
 if [ -z "$value" ] ; then 
     echo "[ERROR] The variable $variable_name is empty."
-    # The function usage must create in script main
     usage
     return 1
 fi
 
 }
 
+#--------------------------------------------------------
+# comment: Check if element exists in a list
+# sintax:
+# contains list element
+#
+# return: 0 is correct or code error
+#
+# Example:
+# contains "1911.1.2.2 1911.1.2.1 1911.1.2.0" "1911.1.2.2"
+#
+contains() {
+
+local list="$1"
+local element="$2"
+
+if [[ "$list" =~ (^|[[:space:]])"$element"($|[[:space:]]) ]] ; then 
+    return 1
+fi
+}
 
 #------------------------
 # Variables
@@ -108,16 +128,21 @@ if [ "$?" -ne "0" ]; then
     exit 6
 fi
 
-DOCKER_IMAGE_LIST=$($GCLOUD container images list --repository "$GCR_ORIGIN" | grep -v NAME)
+DOCKER_IMAGE_SOURCE_LIST=$($GCLOUD container images list --repository "$GCR_ORIGIN" | grep -v NAME)
 if $DEBUG ; then
     echo "[DEBUG] IMAGE-LIST-INIT -------------"
     echo "Images:"
-    echo "$DOCKER_IMAGE_LIST"
+    echo "$DOCKER_IMAGE_SOURCE_LIST"
     echo "[DEBUG] IMAGE-LIST-END"
 fi
 
-for docker_image in $DOCKER_IMAGE_LIST; do
-    TAG_LIST=$($GCLOUD container images list-tags "$docker_image" | awk -F' ' '{ print $2  }' | grep -v ":" | grep -v TAGS | awk -F',' '{ print $1 " " $2 }');
+for docker_image in $DOCKER_IMAGE_SOURCE_LIST; do
+    LAST_NAME_DOCKER_IMAGE=$(echo "$docker_image" | awk -F'/' '{ print $3  }')
+
+    TAG_LIST_SOURCE=$($GCLOUD container images list-tags "$GCR_ORIGIN/$LAST_NAME_DOCKER_IMAGE" | awk -F' ' '{ print $2  }' | grep -v ":" | grep -v TAGS | awk -F',' '{ print $1 " " $2 }');
+
+    TAG_LIST_DESTINY=$($GCLOUD container images list-tags "$GCR_DESTINY/$LAST_NAME_DOCKER_IMAGE" | awk -F' ' '{ print $2  }' | grep -v ":" | grep -v TAGS | awk -F',' '{ print $1 " " $2 }');
+
     if $DEBUG ; then
             echo
             echo
@@ -125,21 +150,28 @@ for docker_image in $DOCKER_IMAGE_LIST; do
             echo "[DEBUG] TAG-LIST-INIT"
             echo "Image: $docker_image"
             echo "Tag list:"
-            echo "$TAG_LIST"
+            echo "$TAG_LIST_SOURCE"
             echo "Command list tag: $GCLOUD container images list-tags $docker_image | awk -F' ' '{ print \$2  }' | grep -v \":\" | grep -v TAGS | awk -F',' '{ print \$1 \" \" \$2 }'"
             echo "[DEBUG] TAG-LIST-END"
             echo
             echo
     fi
 
-    for tag in $TAG_LIST; do
-        LAST_NAME_DOCKER_IMAGE=$(echo "$docker_image" | awk -F'/' '{ print $3  }')
-        if $DEBUG ; then
-            echo "[DEBUG] TAG-INIT"
-            echo "===========> Tag: $tag "
-            echo "Command send image: $GCLOUD container images add-tag $GCR_ORIGIN/$LAST_NAME_DOCKER_IMAGE:$tag $GCR_DESTINY/$LAST_NAME_DOCKER_IMAGE:$tag"
-            echo "[DEBUG] TAG-END"
+    for tag in $TAG_LIST_SOURCE; do
+
+        if contains "$TAG_LIST_DESTINY" "$tag"; then
+            if $DEBUG ; then
+                echo "[DEBUG] TAG-INIT"
+                echo "===========> Tag: $tag "
+                echo "Command send image: $GCLOUD container images add-tag $GCR_ORIGIN/$LAST_NAME_DOCKER_IMAGE:$tag $GCR_DESTINY/$LAST_NAME_DOCKER_IMAGE:$tag $GCLOUD_SILENCE"
+                echo "[DEBUG] TAG-END"
+            fi
+
+            $GCLOUD container images add-tag "$GCR_ORIGIN"/"$LAST_NAME_DOCKER_IMAGE":"$tag" "$GCR_DESTINY"/"$LAST_NAME_DOCKER_IMAGE":"$tag" "$GCLOUD_SILENCE"
+        else
+            echo "[WARNING] The image '$LAST_NAME_DOCKER_IMAGE:$tag' exist in $GCR_DESTINY/$LAST_NAME_DOCKER_IMAGE"
+            echo
+            echo
         fi
-        $GCLOUD container images add-tag "$GCR_ORIGIN"/"$LAST_NAME_DOCKER_IMAGE":"$tag" "$GCR_DESTINY"/"$LAST_NAME_DOCKER_IMAGE":"$tag" "$GCLOUD_SILENCE"
     done
 done

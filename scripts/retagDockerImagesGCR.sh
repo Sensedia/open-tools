@@ -5,6 +5,11 @@
 # Date: 24 ago 2020
 #
 # Objective: Migrate Docker images between GCR repositories
+# Reference:
+#   https://cloud.google.com/container-registry/docs/managing
+#   https://cloud.google.com/sdk/gcloud/reference/container/images/add-tag
+#   https://cloud.google.com/sdk/gcloud/reference/container/images/list
+#   https://cloud.google.com/sdk/gcloud/reference/container/images/list-tags
 #
 #--------------------- REQUISITES --------------------#
 #  1) Install packages: docker gcloud

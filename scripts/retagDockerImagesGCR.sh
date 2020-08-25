@@ -31,6 +31,10 @@ echo "Script to migrate Docker images between GCR repositories."
 echo "Usage:"
 echo " "
 echo "$0 GCR_ORIGIN GCR_DESTINY"
+echo
+echo "Example:"
+echo " "
+echo "$0 gcr.io/myoldproject-gcp-489754 gcr.io/mynewproject-gcp-859407"
 exit 3
 }
 
@@ -149,10 +153,10 @@ for docker_image in $DOCKER_IMAGE_SOURCE_LIST; do
             echo
             echo "#----------------------------------------------"
             echo "[DEBUG] TAG-LIST-INIT"
-            echo "Image: $docker_image"
+            echo "Image: $GCR_ORIGIN/$LAST_NAME_DOCKER_IMAGE"
             echo "Tag list:"
             echo "$TAG_LIST_SOURCE"
-            echo "Command list tag: $GCLOUD container images list-tags $docker_image | awk -F' ' '{ print \$2  }' | grep -v \":\" | grep -v TAGS | awk -F',' '{ print \$1 \" \" \$2 }'"
+            echo "Command list tag: $GCLOUD container images list-tags $GCR_ORIGIN/$LAST_NAME_DOCKER_IMAGE | awk -F' ' '{ print \$2  }' | grep -v \":\" | grep -v TAGS | awk -F',' '{ print \$1 \" \" \$2 }'"
             echo "[DEBUG] TAG-LIST-END"
             echo
             echo

@@ -29,7 +29,7 @@ exit 3
 }
 
 #--------------------------------------------------------
-# comment: Check if existis command
+# comment: Check if exists command
 # sintax:
 # checkCommand command1 command2 command3
 #
@@ -88,7 +88,7 @@ DIR_GIT_BASE=$1
 # Testing if variable is empty
 checkVariable DIR_GIT_BASE "$DIR_GIT_BASE"
 
-# Testing if commands existis
+# Testing if commands exists
 checkCommand git find
 
 

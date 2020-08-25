@@ -63,7 +63,7 @@ done
 
 
 #--------------------------------------------------------
-# comment: Check if existis command
+# comment: Check if exists command
 # sintax:
 # checkCommand command1 command2 command3
 #
@@ -85,7 +85,7 @@ done
 
 
 #------------------------------------------------------------
-# comment: Check if file existis. 
+# comment: Check if file exists. 
 # syntax: existfiles file [file ...]
 #
 existfiles(){

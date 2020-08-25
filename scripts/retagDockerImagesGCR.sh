@@ -39,7 +39,7 @@ exit 3
 }
 
 #--------------------------------------------------------
-# comment: Check if existis command
+# comment: Check if exists command
 # sintax:
 # checkCommand command1 command2 command3
 #
@@ -124,7 +124,7 @@ GCLOUD_SILENCE='--quiet'
 checkVariable GCR_ORIGIN "$GCR_ORIGIN"
 checkVariable GCR_DESTINY "$GCR_DESTINY"
 
-# Testing if commands existis
+# Testing if commands exists
 checkCommand $GCLOUD docker
 
 $GCLOUD auth configure-docker gcr.io ;

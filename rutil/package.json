@@ -1,7 +1,0 @@
-{
-  "name": "rutil",
-  "private": true,
-  "devDependencies": {
-    "gulp": "^4.0.2"
-  }
-}

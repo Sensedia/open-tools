@@ -13,9 +13,10 @@ Repository with tools, charts, scripts and others developed by Sensedia and shar
 
 ```bash
 ├── CONTRIBUTING.md
+├── docker     # tools about docker
+├── git        # tools about git
+├── kubernetes # tools about kubernetes (k8s)
 ├── LICENSE
 ├── README.md
-├── rutil # command line for redis backup/restore
-├── scripts # scripts gerais
-└── tutorials # miscellaneous tutorials
+└── tutorials  # miscellaneous tutorials
 ```

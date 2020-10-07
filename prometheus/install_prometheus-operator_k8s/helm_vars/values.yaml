@@ -1,0 +1,66 @@
+## Default prometheus-operator values for all environments
+
+## General
+nameOverride: "mycompany"
+
+defaultRules:
+  rules:
+    etcd: false
+    kubeScheduler: false
+
+## Alertmanager
+alertmanager:
+  enabled: false
+
+## Grafana
+grafana:
+  enabled: true
+
+## Exporters
+kubelet:
+  enabled: true
+
+kubeControllerManager:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+## Prometheus operator
+prometheusOperator:
+  admissionWebhooks:
+    enabled: true
+  kubeletService:
+    enabled: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+
+## Prometheus
+prometheus:
+  enabled: true
+  prometheusSpec:
+    image:
+      repository: quay.io/prometheus/prometheus
+      tag: v2.21.0
+    resources:
+      limits:
+        cpu: 1024m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 500Mi
+    replicas: 1
+    scrapeInterval: 60s
+    replicaExternalLabelName: "replica"
+    serviceMonitorSelectorNilUsesHelmValues: false

@@ -1,0 +1,4 @@
+prometheus:
+  prometheusSpec:
+    externalLabels:
+      cloud: GCP

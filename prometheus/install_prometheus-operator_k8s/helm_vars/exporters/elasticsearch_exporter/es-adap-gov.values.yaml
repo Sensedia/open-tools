@@ -1,0 +1,27 @@
+# https://github.com/helm/charts/tree/master/stable/elasticsearch-exporter
+replicaCount: 1
+
+image:
+  repository: justwatch/elasticsearch_exporter
+  tag: 1.1.0
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+es:
+  uri: https://vpc-adap-governance-t0-productio-4crqvstv5wurnmpqkcmmnfhcqm.sa-east-1.es.amazonaws.com
+  all: true
+  indices: false
+  indices_settings: false
+  shards: false
+  snapshots: false
+
+serviceMonitor:
+  enabled: true
+  interval: 60s
+  scrapeTimeout: 30s

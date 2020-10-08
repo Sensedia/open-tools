@@ -1,0 +1,21 @@
+# https://github.com/helm/charts/tree/master/stable/prometheus-blackbox-exporter
+fullnameOverride: blackbox-exporter
+
+image:
+  repository: prom/blackbox-exporter
+  tag: v0.15.1
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 300Mi
+  requests:
+    cpu: 30m
+    memory: 50Mi
+
+service:
+  type: ClusterIP
+  port: 9115
+
+replicas: 1

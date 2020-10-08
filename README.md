@@ -16,6 +16,7 @@ Repository with tools, charts, scripts and others developed by Sensedia and shar
 ├── docker     # tools about docker
 ├── git        # tools about git
 ├── kubernetes # tools about kubernetes (k8s)
+├── prometheus # tools about Prometheus
 ├── LICENSE
 ├── README.md
 └── tutorials  # miscellaneous tutorials

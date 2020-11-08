@@ -1,0 +1,10 @@
+.terraform
+kubeconfig*
+config-map-aws-auth*
+*.vscode
+*.terraform
+*.backup
+*.tfstate
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup

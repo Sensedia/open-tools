@@ -25,4 +25,4 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 go version
 ```
 
-More information: https://golang.org/doc/
+More informations: https://golang.org/doc

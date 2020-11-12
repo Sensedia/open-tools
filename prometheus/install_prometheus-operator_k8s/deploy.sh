@@ -115,12 +115,6 @@ PROGDIRNAME=$(dirname $PROGPATHNAME)
 # Load script with our libs and defaults functions
 [ -x $PROGDIRNAME/lib.sh ] && . $PROGDIRNAME/lib.sh 
 
-# Check arguments
-if [ $# -lt 4 ]; then
-    usage
-    exit 3
-fi
-
 # Testing if variable is empty
 checkVariable COMMAND "$COMMAND"
 checkVariable CLOUD "$CLOUD"

@@ -147,6 +147,7 @@ case ${ENVIRONMENT,,} in
     ;;
 esac
 
+# Testing if files existis
 existfiles $DEFAULT_VALUES $CLOUD_VALUES $CLUSTER_VALUES
 
 # Check if should enable dry-run mode

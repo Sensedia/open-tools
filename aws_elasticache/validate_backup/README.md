@@ -31,7 +31,7 @@ Alpine Image with some tools:
 - Change profile, aws_access_key_id and aws_secret_access_key in credentials_example file and rename it to credentials.
 
 # Running
-docker run -it --rm -e "PROFILE=\<profile>" -e "REGION=\<region>" -e "_DEBUG_COMMAND=<on|off>" -e "BACKUP_TIME=\<time>" -e "MY_S3_BUCKET=\<bucket_name>" -e "CACHE_SIZE=\<cache_size>" -e "REDIS_VERSION=\<redis_version>" -e "ZONE_01='<zone_01>'" -e "ZONE_02='<zone_02>'" -e "REPLICATION_GROUP_ID=\<replication_group_id>" -e "SLOT_01=\<slot_01>" -e "SLOT_02=\<slot_02>" -e "SLOT_03=\<slot_03>" -e "MINIMAL_KEYS_PERCENTAGE=\<keys_percentage>" --name sensedia opentools/validate_backup_elasticache:1.0
+docker run -it --rm -e "PROFILE=\<profile>" -e "REGION=\<region>" -e "_DEBUG_COMMAND=<on|off>" -e "BACKUP_TIME=\<time>" -e "MY_S3_BUCKET=\<bucket_name>" -e "CACHE_SIZE=\<cache_size>" -e "REDIS_VERSION=\<redis_version>" -e "ZONE_01='<zone_01>'" -e "ZONE_02='<zone_02>'" -e "REPLICATION_GROUP_ID=\<replication_group_id>" -e "SLOT_01=\<slot_01>" -e "SLOT_02=\<slot_02>" -e "SLOT_03=\<slot_03>" -e "MINIMAL_KEYS_PERCENTAGE=\<keys_percentage>" --name sensedia sensedia/validate_backup_elasticache:1.0
 
 ```diff
 - Change each of the above parameters according to your environment before running docker run command

@@ -55,25 +55,6 @@ return $result_code
 }
 
 #---------------------------------------------------------------------------------------
-# Function Check Files
-#---------------------------------------------------------------------------------------
-# comment: Check if the file existis.
-# syntax: 
-#   existFiles FILE
-# return: 0 is exists or 1 if not exists
-function existFiles(){
-OK=YES
-[ "$1" = "-q" ] && SILENCE=YES && shift
-for file in "$@" ; do
-        [ ! -f "$file" ] && {
-                echo "[ERROR] Don't find file(s): $file."
-                OK=NO
-        }
-done
-[ $OK = YES ] && return 0 || return 1
-}
-
-#---------------------------------------------------------------------------------------
 # Main Variables
 #---------------------------------------------------------------------------------------
 _DEBUG_COMMAND=$_DEBUG_COMMAND
@@ -117,11 +98,6 @@ MINIMAL_KEYS_PERCENTAGE=$MINIMAL_KEYS_PERCENTAGE
 #---------------------------------------------------------------------------------------
 # Testing if commands exists
 checkCommand aws aws-iam-authenticator rdb python3 pip3 curl jq bash vim
-
-# Testing if file exists
-existFiles "/root/.aws/credentials"
-
-#---------------------------------------------------------------------------------------
 
 # Empty the S3 Bucket
 # For some reason, for example, interruption of the script, the bucket may content lost files

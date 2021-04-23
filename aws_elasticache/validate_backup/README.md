@@ -28,19 +28,20 @@ Alpine Image with some tools:
     - https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/backups-exporting.html#backups-exporting-procedures
 - For AWS Elasticache enable Automatic Backup and choose a Backup Retention Period and a Backup Window:
   - https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/backups-automatic.html
-- Change profile, aws_access_key_id and aws_secret_access_key in credentials_example file and rename it to credentials.
 
 # Running
-docker run -it --rm -e "PROFILE=\<profile>" -e "REGION=\<region>" -e "_DEBUG_COMMAND=<on|off>" -e "BACKUP_TIME=\<time>" -e "MY_S3_BUCKET=\<bucket_name>" -e "CACHE_SIZE=\<cache_size>" -e "REDIS_VERSION=\<redis_version>" -e "ZONE_01='<zone_01>'" -e "ZONE_02='<zone_02>'" -e "REPLICATION_GROUP_ID=\<replication_group_id>" -e "SLOT_01=\<slot_01>" -e "SLOT_02=\<slot_02>" -e "SLOT_03=\<slot_03>" -e "MINIMAL_KEYS_PERCENTAGE=\<keys_percentage>" --name sensedia sensedia/validate_backup_elasticache:1.0
+docker run -it --rm -e "AWS_ACCESS_KEY_ID=\<your_aws_access_key_id>" -e "AWS_SECRET_ACCESS_KEY=\<your_aws_secret_key>"" -e "AWS_DEFAULT_REGION=\<region>" -e "_DEBUG_COMMAND=<on|off>" -e "BACKUP_TIME=\<time>" -e "MY_S3_BUCKET=\<bucket_name>" -e "CACHE_SIZE=\<cache_size>" -e "REDIS_VERSION=\<redis_version>" -e "ZONE_01='<zone_01>'" -e "ZONE_02='<zone_02>'" -e "REPLICATION_GROUP_ID=\<replication_group_id>" -e "SLOT_01=\<slot_01>" -e "SLOT_02=\<slot_02>" -e "SLOT_03=\<slot_03>" -e "MINIMAL_KEYS_PERCENTAGE=\<keys_percentage>" --name sensedia sensedia/validate_backup_elasticache:1.0
 
 ```diff
 - Change each of the above parameters according to your environment before running docker run command
 ```
 
 # Parameters Explanation
-PROFILE - Your AWS Profile configureted in credentials file
+AWS_ACCESS_KEY_ID - Your AWS Acess Key ID
 
-REGION - The region of your AWS Elasticache Cluster
+AWS_SECRET_ACCESS_KEY - Your AWS Secret Key
+
+AWS_DEFAULT_REGION - The region of your AWS Elasticache Cluster
 
 _DEBUG_COMMAND - Enable (on) or Disable (off) debug output
 

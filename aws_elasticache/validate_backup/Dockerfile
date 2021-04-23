@@ -49,14 +49,8 @@ RUN rm -rf /var/cache/apk/* \
 # Create scripts directory
 RUN mkdir /scripts
 
-# Create .aws directory in root
-RUN mkdir /root/.aws
-
 # Copy validate_backup_elasticache.sh to /scripts
 COPY validate_backup_elasticache.sh /scripts
-
-# Copy credentials to /root/.aws
-COPY credentials /root/.aws
 
 # Entrypoint
 CMD ["/bin/bash", "-c", "/scripts/validate_backup_elasticache.sh"]

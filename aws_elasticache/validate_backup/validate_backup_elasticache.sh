@@ -76,15 +76,13 @@ done
 #---------------------------------------------------------------------------------------
 # Main Variables
 #---------------------------------------------------------------------------------------
-PROFILE=$PROFILE
-REGION=$REGION
 _DEBUG_COMMAND=$_DEBUG_COMMAND
 
 #---------------------------------------------------------------------------------------
 # Local Temp Files
 #---------------------------------------------------------------------------------------
 # Generating a list of cluster names (customerids)
-aws elasticache describe-cache-clusters --profile $PROFILE --region $REGION | jq -r '.CacheClusters[].CacheClusterId' > customerids
+aws elasticache describe-cache-clusters | jq -r '.CacheClusters[].CacheClusterId' > customerids
 
 # Removing extra node identifications, like 0001-001, 0001-002, 0002-001, 0003-001 and 0003-002
 # Reference: https://stackoverflow.com/questions/19482123/extract-part-of-a-string-using-bash-cut-split/19482947
@@ -105,7 +103,7 @@ REPLICA_DESCRIPTION="Backup Validation Restore"
 NUM_NODES=3
 CACHE_SIZE=$CACHE_SIZE
 REDIS_VERSION=$REDIS_VERSION
-SECURITY_GROUP=$(aws elasticache describe-cache-clusters --cache-cluster-id "${CUSTOMERID}-0001-001" --profile $PROFILE --region $REGION | jq -r '.CacheClusters[].SecurityGroups[].SecurityGroupId')
+SECURITY_GROUP=$(aws elasticache describe-cache-clusters --cache-cluster-id "${CUSTOMERID}-0001-001" | jq -r '.CacheClusters[].SecurityGroups[].SecurityGroupId')
 BACKUPID=backup-${CUSTOMERID}-$(date +%F)-${BACKUP_TIME}
 SLOT_01=$SLOT_01
 SLOT_02=$SLOT_02
@@ -127,15 +125,14 @@ existFiles "/root/.aws/credentials"
 
 # Empty the S3 Bucket
 # For some reason, for example, interruption of the script, the bucket may content lost files
-aws s3 rm s3://$MY_S3_BUCKET --recursive --profile $PROFILE --region $REGION
+aws s3 rm s3://$MY_S3_BUCKET --recursive
 
 # Copy snapshot files to S3 Bucket
 echo "[INFO] Copying snapshot automatic.${CUSTOMERID}-`date +%F`-${BACKUP_TIME} to Bucket S3 $MY_S3_BUCKET"
 aws elasticache copy-snapshot \
 --source-snapshot-name automatic.${CUSTOMERID}-`date +%F`-${BACKUP_TIME} \
 --target-snapshot-name $CUSTOMERID \
---target-bucket $MY_S3_BUCKET \
---profile $PROFILE --region $REGION
+--target-bucket $MY_S3_BUCKET
 
 # Waiting the file copy
 sleep 30
@@ -158,11 +155,10 @@ aws elasticache create-replication-group \
 --cache-subnet-group-name eg-prod-${CUSTOMERID}-production \
 --snapshot-arns arn:aws:s3:::$MY_S3_BUCKET/${CUSTOMERID}-0001.rdb \
 --snapshot-arns arn:aws:s3:::$MY_S3_BUCKET/${CUSTOMERID}-0002.rdb \
---snapshot-arns arn:aws:s3:::$MY_S3_BUCKET/${CUSTOMERID}-0003.rdb \
---profile $PROFILE --region $REGION
+--snapshot-arns arn:aws:s3:::$MY_S3_BUCKET/${CUSTOMERID}-0003.rdb
 
 # Waiting the creating cluster process
-while [ $(aws elasticache describe-cache-clusters --cache-cluster-id $REPLICATION_GROUP_ID-0001-001 --profile $PROFILE --region $REGION 2> /dev/null | jq -r '.CacheClusters[].CacheClusterStatus') = creating 2> /dev/null ]
+while [ $(aws elasticache describe-cache-clusters --cache-cluster-id $REPLICATION_GROUP_ID-0001-001 2> /dev/null | jq -r '.CacheClusters[].CacheClusterStatus') = creating 2> /dev/null ]
 do
   echo "[INFO] Creating cluster $REPLICATION_GROUP_ID ... Wait..."
   sleep 60
@@ -171,11 +167,11 @@ done
 echo "[INFO] Cluster created"
 
 # Take a Snapshot from Actual State of Cluster
-aws elasticache create-snapshot --snapshot-name $BACKUPID --replication-group-id $CUSTOMERID --profile $PROFILE --region $REGION
+aws elasticache create-snapshot --snapshot-name $BACKUPID --replication-group-id $CUSTOMERID
 sleep 5
 
 # Waiting the snapshot process
-while [ $(aws elasticache describe-snapshots --profile $PROFILE --region $REGION --replication-group-id $CUSTOMERID --snapshot-name $BACKUPID | jq -r '.Snapshots[].SnapshotStatus') = creating 2> /dev/null ]
+while [ $(aws elasticache describe-snapshots --replication-group-id $CUSTOMERID --snapshot-name $BACKUPID | jq -r '.Snapshots[].SnapshotStatus') = creating 2> /dev/null ]
 do
   echo "[INFO] Making snapshot $BACKUPID ... Wait..."
   sleep 60
@@ -189,8 +185,7 @@ echo "[INFO] Copying snapshot $BACKUPID to Bucket S3 $MY_S3_BUCKET"
 aws elasticache copy-snapshot \
 --source-snapshot-name $BACKUPID \
 --target-snapshot-name $BACKUPID \
---target-bucket $MY_S3_BUCKET \
---profile $PROFILE --region $REGION
+--target-bucket $MY_S3_BUCKET
 
 echo "[INFO] Copy finished"
 echo " "
@@ -202,8 +197,8 @@ echo "[INFO] Copying .rdb files"
 sleep 30
 for (( f=1; f<=3; f++ ))
 do
-  aws s3 cp s3://$MY_S3_BUCKET/${BACKUPID}-000$f.rdb . --profile $PROFILE --region $REGION
-  aws s3 cp s3://$MY_S3_BUCKET/${CUSTOMERID}-000$f.rdb . --profile $PROFILE --region $REGION
+  aws s3 cp s3://$MY_S3_BUCKET/${BACKUPID}-000$f.rdb .
+  aws s3 cp s3://$MY_S3_BUCKET/${CUSTOMERID}-000$f.rdb .
   rdb -c diff ${BACKUPID}-000$f.rdb  | sort >> dump_backup.txt
   rdb -c diff ${CUSTOMERID}-000$f.rdb  | sort >> dump_customer.txt
 done
@@ -234,10 +229,10 @@ echo " "
 echo "[INFO] Removing everthing ..."
 
 # Deleting Cluster 
-aws elasticache delete-replication-group --replication-group-id "$REPLICATION_GROUP_ID" --profile $PROFILE --region $REGION
+aws elasticache delete-replication-group --replication-group-id "$REPLICATION_GROUP_ID"
 
 # Waiting the cluster destruction process
-while [ $(aws elasticache describe-cache-clusters --cache-cluster-id $REPLICATION_GROUP_ID-0001-001 --profile $PROFILE --region $REGION 2> /dev/null | jq -r '.CacheClusters[].CacheClusterStatus') = deleting 2> /dev/null ]
+while [ $(aws elasticache describe-cache-clusters --cache-cluster-id $REPLICATION_GROUP_ID-0001-001 2> /dev/null | jq -r '.CacheClusters[].CacheClusterStatus') = deleting 2> /dev/null ]
  do
   echo "[INFO] Deleting cluster $REPLICATION_GROUP_ID ... Wait..."
   sleep 60
@@ -249,8 +244,8 @@ echo " "
 echo "[INFO] Deleting .rdb files"
 for (( f=1; f<=3; f++ ))
   do
-    aws s3 rm s3://$MY_S3_BUCKET/${CUSTOMERID}-000$f.rdb --profile $PROFILE --region $REGION
-    aws s3 rm s3://$MY_S3_BUCKET/${BACKUPID}-000$f.rdb --profile $PROFILE --region $REGION
+    aws s3 rm s3://$MY_S3_BUCKET/${CUSTOMERID}-000$f.rdb
+    aws s3 rm s3://$MY_S3_BUCKET/${BACKUPID}-000$f.rdb
     rm -rf ${CUSTOMERID}-000$f.rdb
     rm -rf ${BACKUPID}-000$f.rdb
   done
@@ -258,7 +253,7 @@ for (( f=1; f<=3; f++ ))
 # Deleting Snapshot file
 echo " "
 echo "[INFO] Deleting snapshot file"
-aws elasticache delete-snapshot --snapshot-name $BACKUPID --profile $PROFILE --region $REGION
+aws elasticache delete-snapshot --snapshot-name $BACKUPID
 
 # Remove Local Temp Files
 echo "[INFO] Remove local temp files"

@@ -85,7 +85,7 @@ install_prometheus-operator_k8s/
 Install plugin Helm secrets.
 
 ```bash
-helm plugin install https://github.com/futuresimple/helm-secrets
+helm plugin install https://github.com/jkroepke/helm-secrets --version v3.6.1
 ```
 
 # Prometheus Installation
@@ -95,13 +95,13 @@ Create or access Kubernetes cluster and configure the ``kubectl``.
 Use the script `deploy.sh` in this repo to install/upgrade a release of prometheus-operator.
 
 ```bash
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 helm repo update
 
 cd install_prometheus-operator_k8s
 
-./deploy.sh <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--dry-run] [--debug]
+./deploy.sh <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--debug]
 ```
 
 The `<cluster_name>` argument must be the ``file_cluster.yaml`` wich contains the values to apply in a prometheus-operator deployment.
@@ -145,7 +145,7 @@ Deploy of Prometheus in cluster ``mycluster6`` in environment ``testing`` in GCP
 To uninstall prometheus operator execute the follow command.
 
 ```bash
-helm uninstall monitor --keep-history -n monitoring
+helm uninstall monitor -n monitoring
 ```
 
 # Troubleshooting
@@ -199,8 +199,8 @@ kubectl port-forward POD_NAME 3000:3000 -n monitoring
 
 Access your web navigator in URL http://localhost:3000
 
-**login**: admin
-**password**: prom-operator
+* **login**: admin
+* **password**: prom-operator
 
 To edit password default of Grafana, edit secrets of Grafana of Prometheus Operator:
 

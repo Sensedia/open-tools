@@ -22,7 +22,7 @@ function usage() {
 echo "Script to install or upgrade Prometheus Operator in clusters Kubernetes"
 echo "Usage:"
 echo " "
-echo "$0 <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--dry-run]"
+echo "$0 <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name>"
 }
 
 
@@ -40,7 +40,6 @@ function install_prometheus_operator() {
     --version $CHART_VERSION \
     --namespace $NAMESPACE \
     $DEBUG_DEPLOY \
-    $DRY_RUN \
     $SKIP_CRD \
     -f $DEFAULT_VALUES \
     -f $CLOUD_VALUES \
@@ -58,7 +57,6 @@ function upgrade_prometheus_operator() {
     --version $CHART_VERSION \
     --namespace $NAMESPACE \
     $DEBUG_DEPLOY \
-    $DRY_RUN \
     $SKIP_CRD \
     -f $DEFAULT_VALUES \
     -f $CLOUD_VALUES \
@@ -149,13 +147,6 @@ esac
 
 # Testing if files existis
 existfiles $DEFAULT_VALUES $CLOUD_VALUES $CLUSTER_VALUES
-
-# Check if should enable dry-run mode
-if [ -z "$6" ]; then
-    DRY_RUN=''
-else
-    DRY_RUN='--dry-run'
-fi
 
 if $ADD_HELM_REPO ; then
     echo "[INFO] Add Helm repo '$HELM_REPO_NAME'"

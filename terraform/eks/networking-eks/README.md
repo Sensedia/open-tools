@@ -3,6 +3,7 @@
 - [About](#about)
 - [Requirements](#requirements)
   - [How to](#how-to)
+  - [Requirements](#requirements-1)
   - [Providers](#providers)
   - [Inputs](#inputs)
   - [Outputs](#outputs)
@@ -73,6 +74,17 @@ Useful commands:
 * ``terraform output``   => Reads an output variable from a Terraform state file and prints the value.<br>
 * ``terraform show``     => Inspect Terraform state or plan<br>
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12.19, < 0.13.0 |
+| aws | >= 2.61.0 |
+| local | >= 1.4.0 |
+| null | >= 2.1.2 |
+| random | >= 2.2.1 |
+| template | >= 2.1.2 |
+
 ## Providers
 
 | Name | Version |
@@ -83,7 +95,7 @@ Useful commands:
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | address\_allowed | IP or Net address allowed for remote access. | `any` | n/a | yes |
 | aws\_key\_name | Key pair RSA name. | `any` | n/a | yes |
 | aws\_public\_key\_path | PATH to public key in filesystem local. | `any` | n/a | yes |

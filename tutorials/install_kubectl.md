@@ -11,7 +11,7 @@ Run the following commands to install ``kubectl``.
 ```bash
 sudo su
 
-VERSION=v1.18.10
+VERSION=v1.20.7
 KUBECTL_BIN=kubectl
 
 function install_kubectl {

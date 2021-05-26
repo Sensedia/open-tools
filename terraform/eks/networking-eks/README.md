@@ -23,7 +23,7 @@ NOTE: Developed using Terraform 0.12.x syntax.
 
 =====================
 
-* Configure the AWS Credentials and install the [kubectl](../../../tutorials/install_kubectl.md), [aws-cli](../../../tutorials/install_awscli.md), [terraform](../../../tutorials/install_terraform_0-12.md).
+* Configure the AWS Credentials and install the [kubectl](../../../tutorials/install_kubectl.md), [aws-cli](../../../tutorials/install_awscli.md), [terraform](../../../tutorials/install_terraform.md).
 
 * Create the following resources required for the functioning of the EKS cluster:
   * Bucket S3 and DynamoDB table for Terraform state remote;

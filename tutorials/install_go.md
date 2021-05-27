@@ -9,7 +9,7 @@
 Run the following commands to install Go.
 
 ```bash
-VERSION=1.16.3
+VERSION=1.16.4
 
 mkdir -p $HOME/go/bin
 

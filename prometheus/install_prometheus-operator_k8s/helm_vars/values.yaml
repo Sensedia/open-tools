@@ -52,7 +52,7 @@ prometheus:
   prometheusSpec:
     image:
       repository: quay.io/prometheus/prometheus
-      tag: v2.21.0
+      tag: v2.27.1
     resources:
       limits:
         cpu: 1024m

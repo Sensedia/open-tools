@@ -14,7 +14,7 @@ vpc_id  = "vpc-068004d30dd97a13b"
 
 # EKS
 cluster_name                             = "mycluster-eks-testing"
-cluster_version                          = "1.17"
+cluster_version                          = "1.19"
 lt_name                                  = "mycluster-ec2"
 autoscaling_enabled                      = true
 # https://aws.amazon.com/ec2/pricing/on-demand/
@@ -40,7 +40,7 @@ workers_additional_policies              = [
   "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
   "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
   "arn:aws:iam::255686512659:policy/eks_cluster_autoscaler",
-  "arn:aws:iam::255686512659:policy/alb-ingress-controller"
+  "arn:aws:iam::255686512659:policy/aws_lb_controller"
 ]
 
 worker_additional_security_group_ids     = ["sg-0bc21eaa5b3a26146"]

@@ -3,7 +3,7 @@ provider "aws" {
   shared_credentials_file = var.credentials_file
   profile                 = var.profile
   region                  = var.region
-  version                 = ">= 2.61.0"
+  version                 = ">= 3.22.0"
 }
 
 provider "kubernetes" {
@@ -31,5 +31,6 @@ provider "null" {
 }
 
 terraform {
-  required_version = ">= 0.12.19"
+  required_version = ">= 0.12.19, < 0.13.0"
 }
+

@@ -1,11 +1,11 @@
 <!-- TOC -->
 
-- [[OPTION_1] Install Binary of Terrafor](#option_1-install-binary-of-terrafor)
+- [[OPTION_1] Install Binary of Terrafor](#option_1-install-binary-of-terraform)
 - [[OPTION_2] Install tfenv for management of Terraform versions](#option_2-install-tfenv-for-management-of-terraform-versions)
 
 <!-- TOC -->
 
-# [OPTION_1] Install Binary of Terrafor
+# [OPTION_1] Install Binary of Terraform
 
 Run the following commands to install ``terraform``.
 

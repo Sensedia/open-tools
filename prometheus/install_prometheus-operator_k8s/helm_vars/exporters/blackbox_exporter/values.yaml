@@ -1,10 +1,37 @@
-# https://github.com/helm/charts/tree/master/stable/prometheus-blackbox-exporter
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-blackbox-exporter
 fullnameOverride: blackbox-exporter
 
 image:
   repository: prom/blackbox-exporter
-  tag: v0.15.1
+  tag: v0.19.0
   pullPolicy: IfNotPresent
+
+config:
+  modules:
+    http_2xx:
+      prober: http
+      timeout: 50s
+      http:
+        valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+        valid_status_codes: [200, 301]  # Defaults to 2xx
+        method: GET
+        no_follow_redirects: false
+        fail_if_ssl: false
+        preferred_ip_protocol: "ip4" # defaults to "ip6"
+        ip_protocol_fallback: false  # no fallback to "ip6"
+    https_2xx:
+      prober: http
+      timeout: 50s
+      http:
+        valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+        valid_status_codes: [200, 301]  # Defaults to 2xx
+        method: GET
+        no_follow_redirects: false
+        fail_if_not_ssl: true
+        tls_config:
+          insecure_skip_verify: true
+        preferred_ip_protocol: "ip4" # defaults to "ip6"
+        ip_protocol_fallback: false  # no fallback to "ip6"
 
 resources:
   limits:

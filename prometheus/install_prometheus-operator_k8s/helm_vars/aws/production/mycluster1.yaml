@@ -5,8 +5,10 @@ prometheus:
         cpu: "1"
         memory: 2Gi
       requests:
-        cpu: 300m
-        memory: 300Mi
+        cpu: 500m
+        memory: 500Mi
     externalLabels:
       cluster: kind-kind-multinodes
       region: sa-east-1
+
+

@@ -69,10 +69,13 @@ function upgrade_prometheus_operator() {
 #------------------------
 # Variables
 HELM_DIR='./helm_vars'
+KUBE_DIR='./kube-manifests'
 COMMAND=$1
 CLOUD=$2
 ENVIRONMENT=$3
 CLUSTER=$4
+NAMESPACE='monitoring'
+SEND_VICTORIAMETRICS=true
 # Uncomment next line to disable debug mode during deploy
 #DEBUG_DEPLOY=''
 # Uncomment next line to enable debug mode during deploy
@@ -82,31 +85,29 @@ DEBUG_DEPLOY='--debug'
 # Uncomment next line to enable install crd
 SKIP_CRD=''
 
-#--- Version old of chart
-#    https://github.com/helm/charts/tree/master/stable/prometheus-operator
-#HELM_REPO_NAME='stable'
-#HELM_REPO_URL='https://kubernetes-charts.storage.googleapis.com'
-#HELM_CHART_NAME='prometheus-operator'
-#CHART_VERSION='8.14.0'
-
 #--- Version new of chart
 #    https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 HELM_REPO_NAME='prometheus-community'
 HELM_REPO_URL='https://prometheus-community.github.io/helm-charts'
 HELM_CHART_NAME='kube-prometheus-stack'
-CHART_VERSION='9.4.9'
+CHART_VERSION='40.1.0'
 
 APP_NAME='monitor'
 NAMESPACE='monitoring'
 # Use true to add helm repo always, use false to don't install helm repo
-ADD_HELM_REPO='true'
+ADD_HELM_REPO=true
+
+# File with config values
 DEFAULT_VALUES="$HELM_DIR/values.yaml"
 CLOUD_VALUES="$HELM_DIR/${CLOUD,,}/values.yaml"
 CLUSTER_VALUES="$HELM_DIR/${CLOUD,,}/${ENVIRONMENT,,}/${CLUSTER,,}.yaml"
 
-PROGPATHNAME=$0
+PROGPATHNAME=$BASH_SOURCE
 PROGFILENAME=$(basename $PROGPATHNAME)
 PROGDIRNAME=$(dirname $PROGPATHNAME)
+LIB_FILE="${PROGDIRNAME}/lib.sh"
+DEBUG=true
+_DEBUG_COMMAND="on"
 #------------------------
 
 
@@ -125,7 +126,7 @@ checkCommand git kubectl helm sops
 # Check if cloud provider is supported
 case ${CLOUD,,} in
     aws|gcp)
-        ;;
+    ;;
     *)
         echo "[ERROR] Wrong value for cloud argument."
         usage
@@ -137,7 +138,7 @@ esac
 # Check if environment is supported
 case ${ENVIRONMENT,,} in
     testing|staging|production)
-        ;;
+    ;;
     *)
         echo "[ERROR] Wrong value for environment argument."
         usage
@@ -154,6 +155,39 @@ if $ADD_HELM_REPO ; then
 fi
 
 helm repo update
+
+echo "[INFO] Testing access a kubernetes cluster."
+if ``kubectl cluster-info > /dev/null 2>&1``; then
+    CONTEXT_NAME=$(kubectl config current-context)
+else
+    echo "[ERROR] Failed to access a Kubernetes cluster. Make sure to connect to a cluster before running the script."
+    usage
+fi
+
+SHORT_CLUSTER_NAME=$(echo $CONTEXT_NAME | grep -o $CLUSTER)
+SHORT_CLUSTER_VALUES=$(basename $CLUSTER_VALUES | cut -d'.' -f1)
+
+if [ "$DEBUG" == true ]; then
+    echo "[DEBUG] INIT -------------"
+    echo "[DEBUG] CONTEXT_NAME         => $CONTEXT_NAME"
+    echo "[DEBUG] CLUSTER              => $CLUSTER"
+    echo "[DEBUG] NAMESPACE            => $NAMESPACE"
+    echo "[DEBUG] CLUSTER_VALUES       => $CLUSTER_VALUES"
+    echo "[DEBUG] SHORT_CLUSTER_VALUES => $SHORT_CLUSTER_VALUES"
+    echo "[DEBUG] Helm plugins installed..."
+    helm plugin list
+    echo "[DEBUG] END"
+fi
+
+# Check if user is logged in correct cluster
+if [ "$SHORT_CLUSTER_NAME" != "$SHORT_CLUSTER_VALUES" ]; then
+    MESSAGE="[ERROR] Connect in correct cluster: \"$SHORT_CLUSTER_VALUES\""
+    printRedMessage "$MESSAGE"
+    exit 1
+fi
+
+# Create namespace if not exists
+createNameSpace "$NAMESPACE"
 
 # Execute command to deploy or upgrade helm release of prometheus-operator
 case ${COMMAND,,} in

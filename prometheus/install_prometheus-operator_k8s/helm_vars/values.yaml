@@ -10,7 +10,7 @@ defaultRules:
 
 ## Alertmanager
 alertmanager:
-  enabled: false
+  enabled: true
 
 ## Grafana
 grafana:
@@ -41,10 +41,11 @@ prometheusOperator:
   resources:
     limits:
       cpu: 200m
-      memory: 200Mi
+      memory: 400Mi
     requests:
       cpu: 100m
-      memory: 100Mi
+      memory: 200Mi
+
 
 ## Prometheus
 prometheus:
@@ -52,7 +53,7 @@ prometheus:
   prometheusSpec:
     image:
       repository: quay.io/prometheus/prometheus
-      tag: v2.27.1
+      tag: v2.38.0
     resources:
       limits:
         cpu: 1024m

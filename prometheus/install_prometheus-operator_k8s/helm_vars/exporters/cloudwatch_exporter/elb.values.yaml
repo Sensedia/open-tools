@@ -1,9 +1,9 @@
-# https://github.com/helm/charts/tree/master/stable/prometheus-cloudwatch-exporter
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-cloudwatch-exporter
 replicaCount: 1
 
 image:
   repository: prom/cloudwatch-exporter
-  tag: cloudwatch_exporter-0.6.0
+  tag: v0.15.0
 
 resources:
   limits:
@@ -19,6 +19,7 @@ serviceAccount:
 rbac:
   create: true
 
+# Example: https://hub.docker.com/r/prom/cloudwatch-exporter
 config: |-
   region: sa-east-1
   period_seconds: 240

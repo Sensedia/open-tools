@@ -7,8 +7,11 @@
 - [Summary](#summary)
 - [Prerequisites for Prometheus Installation](#prerequisites-for-prometheus-installation)
 - [Prometheus Installation](#prometheus-installation)
-- [Troubleshooting](#troubleshooting)
-- [Optional: Access Grafana](#optional-access-grafana)
+- [Accessing Prometheus](#accessing-prometheus)
+- [Prometheus Uninstallation](#prometheus-uninstallation)
+- [Troubleshooting of Prometheus installation](#troubleshooting-of-prometheus-installation)
+- [Accessing AlertManager](#accessing-alertmanager)
+- [Accessing Grafana](#accessing-grafana)
 
 <!-- TOC -->
 
@@ -30,7 +33,7 @@ More info about prometheus-operator can find in follow pages.
 * https://sysdig.com/blog/kubernetes-monitoring-with-prometheus-alertmanager-grafana-pushgateway-part-2/
 * https://sysdig.com/blog/kubernetes-monitoring-prometheus-operator-part3/
 
-About config parameters of prometheu-operator:
+About config parameters of prometheus-operator:
 
 * https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
 * https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
@@ -44,6 +47,7 @@ The directory structure is:
 ```bash
 install_prometheus-operator_k8s/
 ├── deploy.sh # script for deploy prometheus-operator
+├── lib.sh # auxiliary script used by deploy.sh
 ├── es-index-size-exporter
 │   └── es-index-size-exporter.py
 ├── helm_vars
@@ -75,20 +79,69 @@ install_prometheus-operator_k8s/
 
 # Prerequisites for Prometheus Installation
 
-* kubectl ~> 1.15 or major
-* helm ~> v3.1.1 or major (see version supported https://helm.sh/docs/topics/version_skew/)
-* gcloud
-* sops -> 3.5.0 or major
-* awscli -> 1.18 or major
+Install for requisites:
+
+* kubectl >= 1.22
+* helm >= v3.7.1
+* sops >= 3.7
+* gcloud config
+* aws-cli
 * git
 
 Install plugin Helm secrets.
 
 ```bash
-helm plugin install https://github.com/jkroepke/helm-secrets --version v3.6.1
+helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
 ```
 
 # Prometheus Installation
+
+---
+
+  ATTENTION: If you have the follow problem in installation of Prometheus-Operator:
+
+**Problem**:
+
+```
+wait.go:48: [debug] beginning wait for 2 resources with timeout of 1m0s
+Error: INSTALLATION FAILED: unable to build kubernetes objects from release manifest: error validating "": error validating data: [ValidationError(Prometheus.spec): unknown field "probeNamespaceSelector" in com.coreos.monitoring.v1.Prometheus.spec, ValidationError(Prometheus.spec): unknown field "probeSelector" in com.coreos.monitoring.v1.Prometheus.spec, ValidationError(Prometheus.spec): unknown field "shards" in com.coreos.monitoring.v1.Prometheus.spec]
+helm.go:88: [debug] error validating "": error validating data: [ValidationError(Prometheus.spec): unknown field "probeNamespaceSelector" in com.coreos.monitoring.v1.Prometheus.spec, ValidationError(Prometheus.spec): unknown field "probeSelector" in com.coreos.monitoring.v1.Prometheus.spec, ValidationError(Prometheus.spec): unknown field "shards" in com.coreos.monitoring.v1.Prometheus.spec]
+```
+
+**Solution**: Remove old CRDs of Prometheus-Operator. Bug: https://github.com/bitnami/charts/issues/3775 and https://github.com/bitnami/charts/issues/4043. Run the follow command:
+
+```bash
+kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
+kubectl delete crd alertmanagers.monitoring.coreos.com
+kubectl delete crd podmonitors.monitoring.coreos.com
+kubectl delete crd probes.monitoring.coreos.com
+kubectl delete crd prometheuses.monitoring.coreos.com
+kubectl delete crd prometheusrules.monitoring.coreos.com
+kubectl delete crd servicemonitors.monitoring.coreos.com
+kubectl delete crd thanosrulers.monitoring.coreos.com
+```
+
+**Problem**:
+
+```
+Error: failed to install CRD crds/crd-alertmanagerconfigs.yaml: unable to recognize "": no matches for kind "CustomResourceDefinition" in version "apiextensions.k8s.io/v1"
+```
+
+**Solution**: Use Kubernetes >= 1.22 and install CRDs.
+
+For release 0.59.1 of prometheus-operator:
+
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+```
+---
 
 Create or access Kubernetes cluster and configure the ``kubectl``.
 
@@ -142,21 +195,33 @@ Deploy of Prometheus in cluster ``mycluster6`` in environment ``testing`` in GCP
 ./deploy.sh install aws testing mycluster6
 ```
 
-To uninstall prometheus operator execute the follow command.
+# Accessing Prometheus
+
+Use command follow to access Prometheus:
+
+```bash
+kubectl port-forward svc/monitor-mycompany-prometheus -n monitoring 9090:9090
+```
+
+Access your web navigator in URL http://localhost:9090
+
+# Prometheus Uninstallation
+
+To uninstall prometheus operator execute the follow command:
 
 ```bash
 helm uninstall monitor -n monitoring
 ```
 
-# Troubleshooting
+# Troubleshooting of Prometheus installation
 
-View the status of the pod with the following command.
+See the status of the pod with the following command:
 
 ```bash
-kubectl get pods -n monitoring
+kubectl --namespace monitoring get pods -l "release=monitor"
 ```
 
-View the Prometheus log with the following command.
+See the Prometheus log with the following command:
 
 ```bash
 kubectl logs -f prometheus-monitor-mycompany-prometheus-0 -c prometheus -n monitoring
@@ -168,13 +233,15 @@ Commands needed to directly perform or debug any promised content for the ``prom
 kubectl exec -it prometheus-monitor-mycompany-prometheus-0 -n monitoring -- sh
 ```
 
-View configuration file of Prometheus generated by Prometheus-Operator.
+See configuration file of Prometheus inside Pod generated by Prometheus-Operator:
 
 ```bash
 cat /etc/prometheus/config_out/prometheus.env.yaml
+
+ls /etc/prometheus/rules/*
 ```
 
-View use resources.
+See resources of pods in use:
 
 ```bash
 kubectl describe pod/prometheus-monitor-mycompany-prometheus-0 -n monitoring
@@ -186,15 +253,22 @@ kubectl top nodes -n monitoring
 
 More informations about Throubleshooting in Prometheus-Operator are available [in this page](https://github.com/coreos/prometheus-operator/blob/master/Documentation/troubleshooting.md)
 
+# Accessing AlertManager
 
-# Optional: Access Grafana
-
-If deploy grafana is defined with value ``true`` in file ``install_prometheus-operator_k8s/helm_vars/values.yaml``, then use commands follow to access Grafana:
+If deploy alertmanager is defined with value ``true`` in file ``install_prometheus-operator_k8s/helm_vars/values.yaml``, then use command follow to access AlertManager:
 
 ```bash
-kubectl get pods -n monitoring | grep grafana
+kubectl port-forward svc/alertmanager-operated -n monitoring 9093:9093
+```
 
-kubectl port-forward POD_NAME 3000:3000 -n monitoring
+Access your web navigator in URL http://localhost:9093
+
+# Accessing Grafana
+
+If deploy grafana is defined with value ``true`` in file ``install_prometheus-operator_k8s/helm_vars/values.yaml``, then use command follow to access Grafana:
+
+```bash
+kubectl port-forward svc/monitor-grafana 3000:80 -n monitoring
 ```
 
 Access your web navigator in URL http://localhost:3000

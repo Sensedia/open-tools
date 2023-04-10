@@ -1,0 +1,21 @@
+cat << EOF > $HOME/kind-3nodes.yaml
+# References:
+# Kind release image: https://github.com/kubernetes-sigs/kind/releases
+# Configuration: https://kind.sigs.k8s.io/docs/user/configuration/
+# Metal LB in Kind: https://kind.sigs.k8s.io/docs/user/loadbalancer
+# Ingress in Kind: https://kind.sigs.k8s.io/docs/user/ingress
+
+# Config compatible with kind v0.17.0
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61
+  - role: worker
+    image: kindest/node:v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61
+  - role: worker
+    image: kindest/node:v1.23.13@sha256:ef453bb7c79f0e3caba88d2067d4196f427794086a7d0df8df4f019d5e336b61
+EOF

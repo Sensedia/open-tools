@@ -1,0 +1,9 @@
+# Setting up Fluent Bit - Step 3 from link https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/fluent-bit/fluent-bit-compatible.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+  namespace: amazon-cloudwatch
+  # IRSA Enabled
+  annotations:
+    eks.amazonaws.com/role-arn: ${irsa_iam_role_arn}

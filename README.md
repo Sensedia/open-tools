@@ -13,13 +13,14 @@ Repository with tools, charts, scripts and others developed by [Sensedia](https:
 
 ```bash
 ├── CONTRIBUTING.md
-├── aws_elasticache # tools about aws elasticache
+├── elasticache     # tools about AWS elasticache
+├── aws_services    # tools about AWS Services using Terraform and Terragrunt
 ├── docker          # tools about docker
 ├── git             # tools about git
 ├── kubernetes      # tools about kubernetes (k8s)
 ├── LICENSE
-├── prometheus # script and config about Prometheus
+├── prometheus      # script and config about Prometheus
 ├── README.md
-├── terraform  # code about Terraform
-└── tutorials  # miscellaneous tutorials
+├── REQUIREMENTS.md # miscellaneous tutorials
+└── tutorials       # miscellaneous tutorials
 ```

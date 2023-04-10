@@ -1,0 +1,159 @@
+formatter: "" # this is required
+
+version: ""
+
+header-from: main.tf
+footer-from: ""
+
+recursive:
+  enabled: false
+  path: modules
+
+sections:
+  hide: []
+  show: []
+
+content: |-
+  <!-- TOC -->
+
+  - [About](#about)
+  - [Requirements](#requirements)
+    - [How to](#how-to-use)
+  - [Documentation of Code Terraform](#documentation-of-code-terraform)
+    - [Providers](#providers)
+    - [Modules](#modules)
+    - [Resources](#resources)
+    - [Inputs](#inputs)
+    - [Outputs](#outputs)
+
+  <!-- TOC -->
+
+  # About
+  
+  Terraform module to create Kubernetes cluster in AWS-EKS 1.25 with self managed nodes, AWS managed nodes and Karpenter nodes.
+
+  1. This directory contains the files:<br>
+  * ``variables.tf`` => where you can define the values of the variables used by ``main.tf``.<br>
+  2. The goal create Kubernetes cluster in AWS-EKS.
+
+  Install [Terraform-docs](https://github.com/terraform-docs/terraform-docs)
+
+  ```bash
+  cd /tmp
+  VERSION=v0.16.0
+  curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/$VERSION/terraform-docs-$VERSION-$(uname)-amd64.tar.gz
+  
+  tar -xzf terraform-docs.tar.gz
+  chmod +x terraform-docs
+  sudo mv terraform-docs /usr/local/bin/terraform-docs
+  rm terraform-docs.tar.gz
+  terraform-docs --version
+  ```
+
+  To update this documentation run these commands:
+
+  > ATTENTION!!! Set values of DIR_TERRAFORM_MODULE variable as you need
+
+  ```bash
+  cd $DIR_TERRAFORM_MODULE
+  terraform-docs markdown table . > README.md
+  ```
+
+  # Requirements
+
+  =====================
+
+  NOTE: Developed using Terraform 1.4.x syntax.
+
+  =====================
+
+
+  ## How to use
+
+  Inside repository directory `live/` create a new directory to host terragrunt.hcl file as you need.
+
+  Create the inputs values according to the need of the environments in the ``variables.tf`` file.
+
+  Validate the settings with the following commands:
+
+  ```bash
+  cd <terragrunt_folder_in_live_directory>
+  terragrunt validate
+  ```
+
+  Useful commands:
+
+  * ``terragrunt --help``    => Show help of command terraform<br>
+  * ``terragrunt console``   => Open a live shell to use terraform commands directly with live state<br>
+  * ``terragrunt providers`` => Prints a tree of the providers used in the configuration<br>
+  * ``terragrunt init``      => Initialize a Terraform working directory<br>
+  * ``terragrunt validate``  => Validates the Terraform files<br>
+  * ``terragrunt plan``      => Generate and show an execution plan<br>
+  * ``terragrunt apply``     => Builds or changes infrastructure<br>
+  * ``terragrunt show``      => Inspect Terraform state or plan<br>
+  * ``terragrunt destroy``   => Destroy Terraform-managed infrastructure
+
+  No destroy some resource:
+
+  * List all resources
+
+  ```bash
+  terragrunt state list
+  ```
+
+  * remove that resource you don't want to destroy, you can add more to be excluded if required
+
+  ```bash
+  terragrunt state rm <resource_to_be_deleted>
+  ```
+
+  * destroy the whole stack except above resource(s)
+
+  ```bash
+  terragrunt destroy
+  ```
+
+  # Documentation of Code Terraform
+
+  {{ .Header }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+Output:
+  file: ""
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true

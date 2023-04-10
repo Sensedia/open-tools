@@ -1,0 +1,22 @@
+---
+# Setting up Fluent Bit - Step 1 from link https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/cloudwatch-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: amazon-cloudwatch
+  labels:
+    name: amazon-cloudwatch
+---
+# Setting up Fluent Bit - Step 2 from link https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs-FluentBit.html
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-cluster-info
+  namespace: amazon-cloudwatch
+data:
+  cluster.name: ${cluster_name}
+  http.port: "2020"
+  http.server: "On"
+  logs.region: ${region}
+  read.head: "Off"
+  read.tail: "On"

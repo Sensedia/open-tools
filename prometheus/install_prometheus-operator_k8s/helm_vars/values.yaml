@@ -52,8 +52,9 @@ prometheus:
   enabled: true
   prometheusSpec:
     image:
-      repository: quay.io/prometheus/prometheus
-      tag: v2.38.0
+      registry: quay.io
+      repository: prometheus/prometheus
+      tag: v2.43.0
     resources:
       limits:
         cpu: 1024m

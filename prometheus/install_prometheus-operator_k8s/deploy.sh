@@ -2,10 +2,10 @@
 
 #------------------------
 # Sensedia
-# Authors: Victor Ribeiro and Aecio Pires
+# Authors: Victor Ribeiro, Aecio Pires, André Déo and Camila Paulino
 # Date: 13 jan 2020
 #
-# Objective: Install or upgrade Prometheus Operator in clusters Kubernetes
+# Objective: Install or upgrade Prometheus Operator in Kubernetes clusters
 #
 #--------------------- REQUISITES --------------------#
 
@@ -19,10 +19,11 @@
 #
 function usage() {
 
-echo "Script to install or upgrade Prometheus Operator in clusters Kubernetes"
-echo "Usage:"
-echo " "
-echo "$0 <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name>"
+echo -E "Script to install or upgrade Prometheus Operator in Kubernetes clusters
+
+Usage:
+
+$PROGPATHNAME <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--dry-run]"
 }
 
 
@@ -39,6 +40,7 @@ function install_prometheus_operator() {
     $HELM_REPO_NAME/$HELM_CHART_NAME \
     --version $CHART_VERSION \
     --namespace $NAMESPACE \
+    $DRY_RUN_HELM_OPTION \
     $DEBUG_DEPLOY \
     $SKIP_CRD \
     -f $DEFAULT_VALUES \
@@ -56,6 +58,7 @@ function upgrade_prometheus_operator() {
     $HELM_REPO_NAME/$HELM_CHART_NAME \
     --version $CHART_VERSION \
     --namespace $NAMESPACE \
+    $DRY_RUN_HELM_OPTION \
     $DEBUG_DEPLOY \
     $SKIP_CRD \
     -f $DEFAULT_VALUES \
@@ -87,10 +90,11 @@ SKIP_CRD=''
 
 #--- Version new of chart
 #    https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+#    https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
 HELM_REPO_NAME='prometheus-community'
 HELM_REPO_URL='https://prometheus-community.github.io/helm-charts'
 HELM_CHART_NAME='kube-prometheus-stack'
-CHART_VERSION='40.1.0'
+CHART_VERSION='45.9.1'
 
 APP_NAME='monitor'
 NAMESPACE='monitoring'
@@ -149,7 +153,16 @@ esac
 # Testing if files existis
 existfiles $DEFAULT_VALUES $CLOUD_VALUES $CLUSTER_VALUES
 
-if $ADD_HELM_REPO ; then
+# Check if should enable dry-run mode
+if [ "$5" == "--dry-run" ] ; then
+    DRY_RUN=true
+    DRY_RUN_HELM_OPTION='--dry-run'
+else
+    DRY_RUN=false
+    DRY_RUN_HELM_OPTION=''
+fi
+
+if [ "$ADD_HELM_REPO" == true ]; then
     echo "[INFO] Add Helm repo '$HELM_REPO_NAME'"
     helm repo add $HELM_REPO_NAME $HELM_REPO_URL
 fi
@@ -192,8 +205,6 @@ createNameSpace "$NAMESPACE"
 # Execute command to deploy or upgrade helm release of prometheus-operator
 case ${COMMAND,,} in
     install)
-        kubectl create ns $NAMESPACE
-
         install_prometheus_operator
         ;;
     upgrade)

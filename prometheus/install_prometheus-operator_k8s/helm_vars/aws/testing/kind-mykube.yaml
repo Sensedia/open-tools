@@ -8,5 +8,5 @@ prometheus:
         cpu: 500m
         memory: 500Mi
     externalLabels:
-      cluster: kind-kind-multinodes
-      region: sa-east-1
+      cluster: kind-mykube
+      region: us-east-2

@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: prom/cloudwatch-exporter
-  tag: v0.15.0
+  tag: v0.15.3
 
 resources:
   limits:
@@ -19,9 +19,9 @@ serviceAccount:
 rbac:
   create: true
 
-# Example: https://hub.docker.com/r/prom/cloudwatch-exporter
+# Examples: https://hub.docker.com/r/prom/cloudwatch-exporter
 config: |-
-  region: sa-east-1
+  region: us-east-2
   period_seconds: 240
   delay_seconds: 300
   metrics:

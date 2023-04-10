@@ -2,7 +2,7 @@
 
 <!-- TOC -->
 
-- [install_prometheus-operator_k8s](#install_prometheus-operator_k8s)
+- [install\_prometheus-operator\_k8s](#install_prometheus-operator_k8s)
 - [About](#about)
 - [Summary](#summary)
 - [Prerequisites for Prometheus Installation](#prerequisites-for-prometheus-installation)
@@ -17,14 +17,14 @@
 
 # About
 
-This repo contains config files to deploy Prometheus in Kubernetes cluster.
+This directory contains config files to deploy Prometheus in Kubernetes cluster.
 
 We use Prometheus Operator to manage the deployments of prometheis along kubernetes clusters.
 
 More info about prometheus-operator can find in follow pages.
 
 * https://github.com/coreos/prometheus-operator
-* https://coreos.com/blog/the-prometheus-operator.html
+* https://prometheus-operator.dev/
 * https://devops.college/prometheus-operator-how-to-monitor-an-external-service-3cb6ac8d5acb
 * https://blog.sebastian-daschner.com/entries/prometheus-kubernetes-operator
 * https://kruschecompany.com/kubernetes-prometheus-operator/
@@ -79,20 +79,7 @@ install_prometheus-operator_k8s/
 
 # Prerequisites for Prometheus Installation
 
-Install for requisites:
-
-* kubectl >= 1.22
-* helm >= v3.7.1
-* sops >= 3.7
-* gcloud config
-* aws-cli
-* git
-
-Install plugin Helm secrets.
-
-```bash
-helm plugin install https://github.com/jkroepke/helm-secrets --version v3.5.0
-```
+Install all packages and binaries following the instructions on the [REQUIREMENTS.md](../../REQUIREMENTS.md) file.
 
 # Prometheus Installation
 
@@ -112,34 +99,51 @@ helm.go:88: [debug] error validating "": error validating data: [ValidationError
 
 ```bash
 kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
+
 kubectl delete crd alertmanagers.monitoring.coreos.com
+
 kubectl delete crd podmonitors.monitoring.coreos.com
+
 kubectl delete crd probes.monitoring.coreos.com
+
 kubectl delete crd prometheuses.monitoring.coreos.com
+
 kubectl delete crd prometheusrules.monitoring.coreos.com
+
 kubectl delete crd servicemonitors.monitoring.coreos.com
+
 kubectl delete crd thanosrulers.monitoring.coreos.com
 ```
 
 **Problem**:
 
 ```
-Error: failed to install CRD crds/crd-alertmanagerconfigs.yaml: unable to recognize "": no matches for kind "CustomResourceDefinition" in version "apiextensions.k8s.io/v1"
+install.go:206: [debug] WARNING: This chart or one of its subcharts contains CRDs. Rendering may fail or contain inaccuracies.
+Error: INSTALLATION FAILED: unable to build kubernetes objects from release manifest: [unable to recognize "": no matches for kind "Alertmanager" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "Prometheus" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "PrometheusRule" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "ServiceMonitor" in version "monitoring.coreos.com/v1"]
+helm.go:88: [debug] [unable to recognize "": no matches for kind "Alertmanager" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "Prometheus" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "PrometheusRule" in version "monitoring.coreos.com/v1", unable to recognize "": no matches for kind "ServiceMonitor" in version "monitoring.coreos.com/v1"]
+unable to build kubernetes objects from release manifest
 ```
 
 **Solution**: Use Kubernetes >= 1.22 and install CRDs.
 
-For release 0.59.1 of prometheus-operator:
+For release 0.63.0 of prometheus-operator:
 
 ```bash
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
-kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.59.1/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+
+kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
 ```
 ---
 
@@ -154,7 +158,7 @@ helm repo update
 
 cd install_prometheus-operator_k8s
 
-./deploy.sh <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--debug]
+./deploy.sh <install|upgrade> <aws|gcp> <testing|staging|production> <cluster_name> [--dry-run]
 ```
 
 The `<cluster_name>` argument must be the ``file_cluster.yaml`` wich contains the values to apply in a prometheus-operator deployment.

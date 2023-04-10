@@ -1,0 +1,25 @@
+# Reference: https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: guest-clusterRole-core
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "endpoints", "events", "namespaces", "nodes", "persistentvolumeclaims", "persistentvolumes", "pods", "pods/log", "podtemplates", "replicationcontrollers", "resourcequotas", "serviceaccounts", "services"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["apps", "autoscaling", "batch", "networking.k8s.io", "storage.k8s.io", "apiextensions.k8s.io", "extensions"]
+    resources: ["*"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: guest-clusterRoleBinding-core
+subjects:
+  - kind: Group
+    name: guest-view
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: guest-clusterRole-core
+  apiGroup: rbac.authorization.k8s.io

@@ -5,7 +5,7 @@ replicaCount: 1
 
 image:
   repository: oliver006/redis_exporter
-  tag: v1.44.0
+  tag: v1.49.0
 
 service:
   type: ClusterIP

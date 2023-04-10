@@ -1,0 +1,12 @@
+prometheus:
+  prometheusSpec:
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+    externalLabels:
+      cluster: kind-mykube
+      region: us-east-2

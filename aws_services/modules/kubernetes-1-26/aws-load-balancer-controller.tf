@@ -27,7 +27,7 @@ resource "helm_release" "aws_load_balancer_controller" {
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  version    = "1.4.8" # Install version v2.4.7 of aws-load-balancer-controller. See new changes on release notes of application: https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases
+  version    = "1.5.3" # Install version v2.5.2 of aws-load-balancer-controller. See new changes on release notes of application: https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases
 
   values = [
     <<-YAML

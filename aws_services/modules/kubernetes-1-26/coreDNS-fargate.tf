@@ -77,7 +77,7 @@ data "aws_eks_addon_version" "this" {
 # A version of helm chart maybe not compatible with custom CoreDNS container image.
 # See compatible list versions of custom CoreDNS container image using the command:
 #
-# K8S_VERSION='1.25'
+# K8S_VERSION='1.26'
 # aws eks describe-addon-versions --addon-name coredns --kubernetes-version $K8S_VERSION --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" --output text
 #
 resource "helm_release" "coredns" {
@@ -93,7 +93,7 @@ resource "helm_release" "coredns" {
   create_namespace = false
   description      = "CoreDNS is a DNS server that chains plugins and provides Kubernetes DNS Services"
   chart            = "coredns"
-  version          = "1.21.0"
+  version          = "1.23.0"
   repository       = "https://coredns.github.io/helm"
 
   # For EKS image repositories https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html

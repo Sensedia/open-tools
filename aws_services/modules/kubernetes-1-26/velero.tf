@@ -80,25 +80,25 @@ resource "helm_release" "velero" {
   name              = "velero"
   repository        = "https://vmware-tanzu.github.io/helm-charts"
   chart             = "velero"
-  version           = "3.1.6"
+  version           = "v4.0.2"
   dependency_update = true
 
   values = [yamlencode({
     configuration = {
-      backupStorageLocation = {
-        bucket = var.velero_s3_bucket_name
-        prefix = var.velero_s3_bucket_prefix
+      backupStorageLocation = [{
+        provider = "aws"
+        bucket   = var.velero_s3_bucket_name
+        prefix   = var.velero_s3_bucket_prefix
         config = {
           region = var.velero_s3_bucket_region
         }
-      }
-      provider               = "aws"
-      features               = "EnableAPIGroupVersions" # enables backup of all versions of a resource
-      defaultVolumesToRestic = var.velero_default_restic
+      }]
+      features                 = "EnableAPIGroupVersions" # enables backup of all versions of a resource
+      defaultVolumesToFsBackup = var.velero_default_fsbackup
     }
     snapshotsEnabled = var.velero_snapshot_enabled
-    deployRestic     = var.velero_deploy_restic
-    restic = {
+    deployNodeAgent  = var.velero_deploy_fsbackup
+    nodeAgent = {
       podVolumePath = "/var/lib/kubelet/pods"
       privileged    = false
       resources = {
@@ -115,17 +115,9 @@ resource "helm_release" "velero" {
     credentials = {
       useSecret = false
     }
-    image = {
-      tag = "v1.9.4"
-    }
-    kubectl = {
-      image = {
-        tag = "1.24"
-      }
-    }
     initContainers = [
       {
-        image = "velero/velero-plugin-for-aws:v1.6.0"
+        image = "velero/velero-plugin-for-aws:v1.7.0"
         name  = "velero-plugin-for-aws"
         volumeMounts = [
           {

@@ -14,7 +14,7 @@
 
 # About
 
-Terraform module to create Kubernetes cluster in AWS-EKS 1.25 with self managed nodes, AWS managed nodes and Karpenter nodes.
+Terraform module to create Kubernetes cluster in AWS-EKS 1.26 with self managed nodes, AWS managed nodes and Karpenter nodes.
 
 1. This directory contains the files:<br>
 * ``variables.tf`` => where you can define the values of the variables used by ``main.tf``.<br>
@@ -47,10 +47,13 @@ terraform-docs markdown table . > README.md
 
 =====================
 
-NOTE: Developed using Terraform 1.4.x syntax.
+NOTE: Developed using Terraform 1.4.x syntax and tested with Terragrunt 0.45.x.
 
 =====================
 
+* Configure AWS access credentials using IAM Roles.
+
+* Install tfenv and tgenv commands.
 
 ## How to use
 
@@ -110,7 +113,7 @@ terragrunt destroy
 | <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 1.14 |
 | <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | ~> 2.19 |
 | <a name="provider_null"></a> [null](#provider\_null) | ~> 3.2 |
-| <a name="provider_time"></a> [time](#provider\_time) | n/a |
+| <a name="provider_time"></a> [time](#provider\_time) | ~> 0.9 |
 
 ## Modules
 
@@ -119,7 +122,7 @@ terragrunt destroy
 | <a name="module_aws_ebs_csi_driver_irsa"></a> [aws\_ebs\_csi\_driver\_irsa](#module\_aws\_ebs\_csi\_driver\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
 | <a name="module_aws_efs_csi_driver_irsa"></a> [aws\_efs\_csi\_driver\_irsa](#module\_aws\_efs\_csi\_driver\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
 | <a name="module_cluster_autoscaler_irsa_role"></a> [cluster\_autoscaler\_irsa\_role](#module\_cluster\_autoscaler\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
-| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 19.12 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 19.14 |
 | <a name="module_fluentbit_irsa"></a> [fluentbit\_irsa](#module\_fluentbit\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
 | <a name="module_karpenter_irsa"></a> [karpenter\_irsa](#module\_karpenter\_irsa) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
 | <a name="module_load_balancer_controller_irsa_role"></a> [load\_balancer\_controller\_irsa\_role](#module\_load\_balancer\_controller\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.3 |
@@ -152,6 +155,7 @@ terragrunt destroy
 | [kubectl_manifest.fluentbit_02](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
 | [kubectl_manifest.guest_core_rbac](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
 | [kubectl_manifest.karpenter_provisioner](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
+| [kubectl_manifest.storage_class_gp3](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
 | [kubectl_manifest.view_rbac](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
 | [kubernetes_config_map.aws_auth](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map) | resource |
 | [kubernetes_config_map_v1_data.aws_auth](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map_v1_data) | resource |
@@ -160,6 +164,7 @@ terragrunt destroy
 | [null_resource.modify_vpc_cni](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.namespace_customization](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.remove_default_coredns_deployment](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.storage_class_gp3](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [time_sleep.aws_auth](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.aws_ebs_csi_driver](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.aws_efs_csi_driver](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
@@ -229,7 +234,7 @@ terragrunt destroy
 | <a name="input_cluster_service_ipv4_cidr"></a> [cluster\_service\_ipv4\_cidr](#input\_cluster\_service\_ipv4\_cidr) | The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. | `string` | `null` | no |
 | <a name="input_cluster_tags"></a> [cluster\_tags](#input\_cluster\_tags) | A map of additional tags to add to the cluster. | `map(string)` | `{}` | no |
 | <a name="input_cluster_timeouts"></a> [cluster\_timeouts](#input\_cluster\_timeouts) | Create, update, and delete timeout configurations for the cluster. | `map(string)` | `{}` | no |
-| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.23`). | `string` | `"1.25"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.26`). | `string` | `"1.26"` | no |
 | <a name="input_control_plane_subnet_ids"></a> [control\_plane\_subnet\_ids](#input\_control\_plane\_subnet\_ids) | A list of subnet IDs where the EKS cluster control plane (ENIs) will be provisioned. Used for expanding the pool of subnets used by nodes/node groups without replacing the EKS control plane. | `list(string)` | `[]` | no |
 | <a name="input_coredns_fargate"></a> [coredns\_fargate](#input\_coredns\_fargate) | If enabled, deploy coreDNS on Fargate nodes to demonstrate this scenario. | `bool` | `false` | no |
 | <a name="input_coredns_time_wait"></a> [coredns\_time\_wait](#input\_coredns\_time\_wait) | Time wait after cluster creation for access API Server for resource deploy. | `string` | `"30s"` | no |
@@ -262,6 +267,7 @@ terragrunt destroy
 | <a name="input_install_aws_vpc_cni_with_vpn"></a> [install\_aws\_vpc\_cni\_with\_vpn](#input\_install\_aws\_vpc\_cni\_with\_vpn) | Enable (if true) or disable (if false) the creation of the AWS VPC CNI (Container Network Interface) with support to VPN (Virtual Private Network). If false, the parameter 'install\_aws\_vpc\_cni\_without\_vpn' must have 'true' value. If true, the parameter 'install\_aws\_vpc\_cni\_without\_vpn' must have 'false' value. | `bool` | `false` | no |
 | <a name="input_install_aws_vpc_cni_without_vpn"></a> [install\_aws\_vpc\_cni\_without\_vpn](#input\_install\_aws\_vpc\_cni\_without\_vpn) | Enable (if true) or disable (if false) the creation of the AWS VPC CNI (Container Network Interface) without support to VPN (Virtual Private Network). If true, the parameter 'install\_aws\_vpc\_cni\_with\_vpn' must have 'false' value. If false, the parameter 'install\_aws\_vpc\_cni\_with\_vpn' must have 'true' value. | `bool` | `true` | no |
 | <a name="input_install_metrics_server"></a> [install\_metrics\_server](#input\_install\_metrics\_server) | Enable (if true) or disable (if false) the installation of the metrics-server. | `bool` | `true` | no |
+| <a name="input_install_storage_class_gp3"></a> [install\_storage\_class\_gp3](#input\_install\_storage\_class\_gp3) | Change (if true) setup default of default StorageClass from GP2 to GP3. | `bool` | `true` | no |
 | <a name="input_install_traefik"></a> [install\_traefik](#input\_install\_traefik) | Enable (if true) or disable (if false) the installation of the trafik. | `bool` | `true` | no |
 | <a name="input_install_velero"></a> [install\_velero](#input\_install\_velero) | Enable (if true) or disable (if false) the installation of Velero. | `bool` | `false` | no |
 | <a name="input_karpenter_amifamily"></a> [karpenter\_amifamily](#input\_karpenter\_amifamily) | Instance AMI Type. Can be Bottlerocket (53s to Ready) or AL2 (70s to Ready). | `string` | `"Bottlerocket"` | no |
@@ -279,6 +285,7 @@ terragrunt destroy
 | <a name="input_namespace_time_wait"></a> [namespace\_time\_wait](#input\_namespace\_time\_wait) | Time wait after cluster creation for access API Server for resource deploy. | `string` | `"30s"` | no |
 | <a name="input_node_security_group_additional_rules"></a> [node\_security\_group\_additional\_rules](#input\_node\_security\_group\_additional\_rules) | List of additional security group rules to add to the node security group created. Set `source_cluster_security_group = true` inside rules to set the `cluster_security_group` as source. | `any` | `{}` | no |
 | <a name="input_node_security_group_description"></a> [node\_security\_group\_description](#input\_node\_security\_group\_description) | Description of the node security group created. | `string` | `"EKS node shared security group"` | no |
+| <a name="input_node_security_group_enable_recommended_rules"></a> [node\_security\_group\_enable\_recommended\_rules](#input\_node\_security\_group\_enable\_recommended\_rules) | Determines whether to enable recommended security group rules for the node security group created. This includes node-to-node TCP ingress on ephemeral ports and allows all egress traffic. | `bool` | `true` | no |
 | <a name="input_node_security_group_id"></a> [node\_security\_group\_id](#input\_node\_security\_group\_id) | ID of an existing security group to attach to the node groups created. | `string` | `""` | no |
 | <a name="input_node_security_group_name"></a> [node\_security\_group\_name](#input\_node\_security\_group\_name) | Name to use on node security group created. | `string` | `null` | no |
 | <a name="input_node_security_group_tags"></a> [node\_security\_group\_tags](#input\_node\_security\_group\_tags) | A map of additional tags to add to the node security group created. | `map(string)` | `{}` | no |
@@ -287,6 +294,7 @@ terragrunt destroy
 | <a name="input_profile"></a> [profile](#input\_profile) | Profile of AWS credential. | `string` | n/a | yes |
 | <a name="input_rbac_time_wait"></a> [rbac\_time\_wait](#input\_rbac\_time\_wait) | Time wait after cluster creation for access API Server for resource deploy. | `string` | `"30s"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS region. Reference: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions. | `string` | n/a | yes |
+| <a name="input_scost"></a> [scost](#input\_scost) | A value to associate all internal components to a specific cost ID. | `string` | `""` | no |
 | <a name="input_self_managed_node_group_defaults"></a> [self\_managed\_node\_group\_defaults](#input\_self\_managed\_node\_group\_defaults) | Map of self-managed node group default configurations | `any` | `{}` | no |
 | <a name="input_self_managed_node_groups"></a> [self\_managed\_node\_groups](#input\_self\_managed\_node\_groups) | Map of self-managed node group definitions to create | `any` | `{}` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | A list of subnet IDs where the nodes/node groups will be provisioned. If `control_plane_subnet_ids` is not provided, the EKS cluster control plane (ENIs) will be provisioned in these subnets. | `list(string)` | `[]` | no |
@@ -295,8 +303,8 @@ terragrunt destroy
 | <a name="input_traefik_ingress_alb_certificate_arn"></a> [traefik\_ingress\_alb\_certificate\_arn](#input\_traefik\_ingress\_alb\_certificate\_arn) | ARN of a certificate to attach an AWS ALB linked to traefik-ingress. | `string` | `""` | no |
 | <a name="input_traefik_time_wait"></a> [traefik\_time\_wait](#input\_traefik\_time\_wait) | Time wait after cluster creation for access API Server for resource deploy. | `string` | `"30s"` | no |
 | <a name="input_type_worker_node_group"></a> [type\_worker\_node\_group](#input\_type\_worker\_node\_group) | Enter type of worker node group. Types supported: KARPENTER, AWS\_MANAGED\_NODE (requires 'eks\_managed\_node\_groups' parameter to be set) and SELF\_MANAGED\_NODE (requires 'self\_managed\_node\_groups' parameter to be set). | `string` | `"AWS_MANAGED_NODE"` | no |
-| <a name="input_velero_default_restic"></a> [velero\_default\_restic](#input\_velero\_default\_restic) | True if all volume migration should use Restic. False otherwise. | `bool` | `false` | no |
-| <a name="input_velero_deploy_restic"></a> [velero\_deploy\_restic](#input\_velero\_deploy\_restic) | Whether Restic should be deployed to migrate volumes at filesystem level. | `bool` | `false` | no |
+| <a name="input_velero_default_fsbackup"></a> [velero\_default\_fsbackup](#input\_velero\_default\_fsbackup) | True if all volume migration should use FileSystemBackup. False otherwise. | `bool` | `false` | no |
+| <a name="input_velero_deploy_fsbackup"></a> [velero\_deploy\_fsbackup](#input\_velero\_deploy\_fsbackup) | Whether FileSystemBackup should be deployed to migrate volumes at filesystem level. | `bool` | `false` | no |
 | <a name="input_velero_irsa"></a> [velero\_irsa](#input\_velero\_irsa) | The velero IRSA configuration. | `bool` | `false` | no |
 | <a name="input_velero_s3_bucket_name"></a> [velero\_s3\_bucket\_name](#input\_velero\_s3\_bucket\_name) | The s3 bucket for velero backups storage. | `string` | `""` | no |
 | <a name="input_velero_s3_bucket_prefix"></a> [velero\_s3\_bucket\_prefix](#input\_velero\_s3\_bucket\_prefix) | The s3 bucket directory prefix. | `string` | `""` | no |

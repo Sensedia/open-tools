@@ -26,7 +26,7 @@ resource "helm_release" "metrics_server" {
   name              = "metrics-server"
   repository        = "https://kubernetes-sigs.github.io/metrics-server"
   chart             = "metrics-server"
-  version           = "3.9.0" # Install version 0.6.3 of metrics-server. See new changes on release notes of application: https://github.com/kubernetes-sigs/metrics-server/releases
+  version           = "3.10.0" # Install version 0.6.3 of metrics-server. See new changes on release notes of application: https://github.com/kubernetes-sigs/metrics-server/releases
   dependency_update = true
 
   values = [

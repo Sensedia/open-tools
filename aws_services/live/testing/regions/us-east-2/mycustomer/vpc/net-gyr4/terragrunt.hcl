@@ -20,7 +20,7 @@ locals {
 # working directory, into a temporary folder, and execute your Terraform commands in that folder.
 terraform {
   # Added double slash terragrunt: https://ftclausen.github.io/dev/infra/terraform-solving-the-double-slash-mystery/
-  source = "tfr:///terraform-aws-modules/vpc/aws//?version=4.0.1"
+  source = "tfr:///terraform-aws-modules/vpc/aws//?version=4.0.2"
 }
 
 # These are the variables we have to pass in to use the module specified in the terragrunt configuration above

@@ -90,7 +90,7 @@ data "kubectl_path_documents" "fluentbit_02" {
 
   vars = {
     cw_retention_in_days = var.fluentbit_cw_log_group_retention_in_days
-    tags                 = join(",",([for k, v in var.tags : "${k}=${v}"]))
+    tags                 = join(",", ([for k, v in var.tags : "${k}=${v}"]))
   }
 }
 

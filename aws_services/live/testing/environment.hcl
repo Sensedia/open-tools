@@ -7,7 +7,7 @@
 locals {
   environment_name        = "testing"
   short_environment_name  = "tst"
-  account_id              = "255686512659"
+  account_id              = "CHANGE_HERE"
   bucket_remote_tfstate   = "terragrunt-remote-state-${local.account_id}"
   dynamodb_remote_tfstate = "terragrunt-state-lock-dynamo-${local.account_id}"
   aws_profile             = "my-account"

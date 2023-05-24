@@ -658,7 +658,7 @@ sudo ln -s ~/.tfenv/bin/* /usr/local/bin
 Install Terraform version using ``tfenv`` command:
 
 ```bash
-tfenv install 1.4.4
+tfenv install 1.4.6
 ```
 
 More information about ``tfenv``: https://github.com/tfutils/tfenv
@@ -694,7 +694,7 @@ Create the ``.terraform-version`` file at the root of the project with the desir
 Example:
 
 ```bash
-echo "1.4.4" > .terraform-version
+echo "1.4.6" > .terraform-version
 ```
 
 # Terraform-Docs
@@ -742,7 +742,7 @@ sudo ln -s ~/.tgenv/bin/* /usr/local/bin
 Install Terragrunt version using ``tgenv`` command:
 
 ```bash
-tgenv install 0.45.2
+tgenv install 0.45.15
 ```
 
 List Terragrunt versions to install:
@@ -776,7 +776,7 @@ Create the ``.terragrunt-version`` file at the root of the project with the desi
 Example:
 
 ```bash
-echo "0.45.2" > .terragrunt-version
+echo "0.45.15" > .terragrunt-version
 ```
 
 There is a problem in ``tgenv`` versions where very old terragrunt versions are not remotely installed/listed. This is due to a query used in the code [that uses the GitHub API](https://github.com/cunymatthieu/tgenv/blob/master/libexec/tgenv-list-remote#L12). For this, we have a possible workaround

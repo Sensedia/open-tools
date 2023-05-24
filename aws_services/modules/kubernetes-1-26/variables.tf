@@ -23,6 +23,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "scost" {
+  description = "A value to associate all internal components to a specific cost ID."
+  type        = string
+  default     = ""
+}
+
 
 ################################################################################
 # cluster
@@ -116,9 +122,9 @@ variable "cluster_name" {
 }
 
 variable "cluster_version" {
-  description = "Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.23`)."
+  description = "Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.26`)."
   type        = string
-  default     = "1.25"
+  default     = "1.26"
 }
 
 variable "control_plane_subnet_ids" {
@@ -253,6 +259,12 @@ variable "cluster_security_group_tags" {
 ################################################################################
 variable "create_node_security_group" {
   description = "Determines whether to create a security group for the node groups or use the existing `node_security_group_id`."
+  type        = bool
+  default     = true
+}
+
+variable "node_security_group_enable_recommended_rules" {
+  description = "Determines whether to enable recommended security group rules for the node security group created. This includes node-to-node TCP ingress on ephemeral ports and allows all egress traffic."
   type        = bool
   default     = true
 }
@@ -791,14 +803,14 @@ variable "velero_s3_bucket_region" {
   default     = ""
 }
 
-variable "velero_deploy_restic" {
-  description = "Whether Restic should be deployed to migrate volumes at filesystem level."
+variable "velero_deploy_fsbackup" {
+  description = "Whether FileSystemBackup should be deployed to migrate volumes at filesystem level."
   type        = bool
   default     = false
 }
 
-variable "velero_default_restic" {
-  description = "True if all volume migration should use Restic. False otherwise."
+variable "velero_default_fsbackup" {
+  description = "True if all volume migration should use FileSystemBackup. False otherwise."
   type        = bool
   default     = false
 }
@@ -813,4 +825,13 @@ variable "velero_irsa" {
   description = "The velero IRSA configuration."
   type        = bool
   default     = false
+}
+
+################################################################################
+# StorageClass GP3
+################################################################################
+variable "install_storage_class_gp3" {
+  description = "Change (if true) setup default of default StorageClass from GP2 to GP3."
+  type        = bool
+  default     = true
 }

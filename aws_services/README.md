@@ -342,7 +342,7 @@ terragrunt destroy
 Run the command:
 
 ```bash
-AWS_ACCOUNT_ID='255686512659'
+AWS_ACCOUNT_ID='CHANGE_HERE'
 AWS_REGION='us-east-2'
 
 aws s3 rb "s3://terragrunt-remote-state-${AWS_ACCOUNT_ID}" \
@@ -368,7 +368,7 @@ References:
 Run the command:
 
 ```bash
-AWS_ACCOUNT_ID='255686512659'
+AWS_ACCOUNT_ID='CHANGE_HERE'
 AWS_REGION='us-east-2'
 
 aws dynamodb delete-table \

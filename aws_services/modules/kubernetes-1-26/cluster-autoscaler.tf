@@ -25,12 +25,15 @@ resource "helm_release" "cluster_autoscaler" {
   name              = "cluster-autoscaler"
   repository        = "https://kubernetes.github.io/autoscaler"
   chart             = "cluster-autoscaler"
-  version           = "9.28.0" # Install version 1.26.2 of cluster-autoscaler. See new changes on release notes of application: https://github.com/kubernetes/autoscaler/releases
+  version           = "9.29.0" # Installed latest version of cluster-autoscaler chart, but 'image.tag' was customized. See new changes on release notes of application: https://github.com/kubernetes/autoscaler/releases
   dependency_update = true
 
   values = [
     <<-YAML
     replicaCount: 2
+
+    image:
+      tag: v1.26.2
 
     priorityClassName: "system-cluster-critical"
 

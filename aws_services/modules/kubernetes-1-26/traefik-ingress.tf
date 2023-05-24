@@ -28,15 +28,21 @@ resource "helm_release" "traefik" {
   name              = "traefik"
   repository        = "https://helm.traefik.io/traefik"
   chart             = "traefik"
-  version           = "10.33.0" # Install version 2.8.7 of traefik. See new changes on release notes of application: https://github.com/traefik/traefik/releases
+  version           = "23.0.1" # Install version 2.10.1 of traefik. See new changes on release notes of application: https://github.com/traefik/traefik/releases
   dependency_update = true
 
   values = [
     <<-YAML
+    instanceLabelOverride: traefik
+    nameOverride: traefik
+
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 25%
+
     ingressClass:
       enabled: true
       isDefaultClass: false
-      fallbackApiVersion: ""
 
     ingressRoute:
       dashboard:
@@ -44,13 +50,11 @@ resource "helm_release" "traefik" {
         annotations:
           kubernetes.io/ingress.class: traefik-internal
 
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
-
-    podDisruptionBudget:
-      enabled: true
-      minAvailable: 1
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 1
 
     readinessProbe:
       failureThreshold: 1
@@ -70,12 +74,12 @@ resource "helm_release" "traefik" {
       kubernetesCRD:
         enabled: true
         allowCrossNamespace: false
-        allowExternalNameServices: false
+        allowExternalNameServices: true
         ingressClass: traefik-internal
 
       kubernetesIngress:
         enabled: true
-        allowExternalNameServices: false
+        allowExternalNameServices: true
         allowEmptyServices: false
         ingressClass: traefik-internal
         publishedService:
@@ -85,16 +89,18 @@ resource "helm_release" "traefik" {
       general:
         level: ERROR
       access:
-        enabled: true
+        enabled: false
         fields:
           general:
             defaultmode: keep
           headers:
-            defaultmode: drop
+            defaultmode: keep
 
     metrics:
       prometheus:
         entryPoint: metrics
+        addEntryPointsLabels: true
+        addRoutersLabels: true
 
     globalArguments:
       - "--global.checknewversion"
@@ -144,17 +150,30 @@ resource "helm_release" "traefik" {
       - type: Resource
         resource:
           name: cpu
-          targetAverageUtilization: 60
+          target:
+            type: Utilization
+            averageUtilization: 60
       - type: Resource
         resource:
           name: memory
-          targetAverageUtilization: 60
+          target:
+            type: Utilization
+            averageUtilization: 60
+
 
     hostNetwork: false
 
     rbac:
       enabled: true
       namespaced: false
+
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        cpu: "300m"
+        memory: "150Mi"
 
     affinity:
       podAntiAffinity:
@@ -165,14 +184,6 @@ resource "helm_release" "traefik" {
           namespaces:
           - traefik
           topologyKey: kubernetes.io/hostname
-
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "100Mi"
-      limits:
-        cpu: "300m"
-        memory: "150Mi"
     YAML
   ]
 }
@@ -205,7 +216,11 @@ resource "kubectl_manifest" "alb_traefik_ingress" {
       alb.ingress.kubernetes.io/healthcheck-port: traefik
       alb.ingress.kubernetes.io/certificate-arn: "${var.traefik_ingress_alb_certificate_arn}"
       alb.ingress.kubernetes.io/inbound-cidrs: "${var.traefik_inbound_cidrs}"
+      %{ if var.scost != "" && var.scost != null }
+      alb.ingress.kubernetes.io/tags: Scost=${var.scost}, Environment=${var.environment}, Terraform=true, Kubernetes=true
+      %{ else }
       alb.ingress.kubernetes.io/tags: Scost=Rshared-traefik, Environment=${var.environment}, Terraform=true, Kubernetes=true
+      %{ endif }
   spec:
     rules:
     - http:

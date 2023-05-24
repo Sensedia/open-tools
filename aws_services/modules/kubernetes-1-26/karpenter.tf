@@ -41,7 +41,7 @@ resource "helm_release" "karpenter" {
   name              = "karpenter"
   repository        = "oci://public.ecr.aws/karpenter"
   chart             = "karpenter"
-  version           = "v0.27.1" # Install version 0.27.1 of karpenter. See new changes on release notes of application: https://github.com/aws/karpenter/releases
+  version           = "v0.27.5" # Install version 0.27.5 of karpenter. See new changes on release notes of application: https://github.com/aws/karpenter/releases
   dependency_update = true
 
   values = [

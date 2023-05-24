@@ -31,7 +31,7 @@ locals {
 # working directory, into a temporary folder, and execute your Terraform commands in that folder.
 terraform {
   # Added double slash terragrunt: https://ftclausen.github.io/dev/infra/terraform-solving-the-double-slash-mystery/
-  source = "../../../../../../../modules//kubernetes-1-25/"
+  source = "${get_repo_root()}/aws_services/modules//kubernetes-1-26"
 }
 
 dependencies {
@@ -108,7 +108,7 @@ inputs = {
   cluster_endpoint_public_access_cidrs = local.cluster_endpoint_public_access_cidrs
   cluster_endpoint_private_access      = true
 
-  create_kms_key            = true
+  create_kms_key            = false
   cluster_encryption_config = {
     provider_key_arn = dependency.kms.outputs.key_arn,
     resources        = ["secrets"]
@@ -169,6 +169,7 @@ inputs = {
           ebs = {
             volume_size = 50
             volume_type = "gp3"
+            encrypted   = true
           }
         }
       }
@@ -195,6 +196,7 @@ inputs = {
           ebs = {
             volume_size = 50
             volume_type = "gp3"
+            encrypted   = true
           }
         }
       }
@@ -209,83 +211,7 @@ inputs = {
 
   # Set this parameter only if you want to use 'type_worker_node_group' with value 'SELF_MANAGED_NODE'
   # More options in https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/modules/self-managed-node-group#inputs
-  self_managed_node_groups = {
-    "${local.cluster_shortname}-lt-spot" = {
-      name                = "${local.cluster_shortname}-lt-spot"
-      suspended_processes = ["AZRebalance"]
-      key_name            = dependency.keypair.outputs.key_pair_name
-      min_size            = 2
-      max_size            = 20
-      desired_size        = 2
-      enable_monitoring   = false
-      capacity_rebalance  = true
-
-      block_device_mappings = {
-        xvda = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size = 50
-            volume_type = "gp3"
-          }
-        }
-      }
-
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
-
-      use_mixed_instances_policy = true
-      mixed_instances_policy = {
-        instances_distribution = {
-          on_demand_percentage_above_base_capacity = 50
-        }
-
-        # See page https://aws.amazon.com/pt/ec2/instance-types/ to find type, resources and price of instance
-        # ec2-instance-selector --memory CHANGE_HERE --vcpus CHANGE_HERE --cpu-architecture x86_64 --hypervisor nitro --service eks --usage-class spot --region AWS_REGION --profile AWS_PROFILE
-        #
-        # Example:
-        # ec2-instance-selector --memory 4 --vcpus 2 --cpu-architecture x86_64 --hypervisor nitro --service eks --usage-class spot --region us-east-2 --profile my-account
-        override = [
-          { instance_type = "c5.large" },
-          { instance_type = "c5a.large" },
-          { instance_type = "c5ad.large" },
-          { instance_type = "c5d.large" },
-          { instance_type = "c6a.large" },
-          { instance_type = "c6i.large" },
-          { instance_type = "c6id.large" },
-          { instance_type = "c6in.large" },
-          { instance_type = "t3.medium" },
-          { instance_type = "t3a.medium" },
-        ]
-      }
-
-      network_interfaces = [
-        {
-          associate_public_ip_address = false
-        }
-      ]
-
-      metadata_options = {
-        http_endpoint               = "enabled"
-        http_tokens                 = "required"
-        http_put_response_hop_limit = 2
-      }
-
-      iam_role_additional_policies = {
-        CloudWatchAgentServerPolicy  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-        CloudWatchLogsFullAccess     = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-        AmazonEC2ReadOnlyAccess      = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
-        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-      }
-
-      autoscaling_group_tags = {
-        "k8s.io/cluster-autoscaler/enabled"               = "true",
-        "k8s.io/cluster-autoscaler/${local.cluster_name}" = "true",
-      }
-
-      tags = {
-        "aws-node-termination-handler/managed" = "true",
-      }
-    }
-  }
+  self_managed_node_groups = {}
 
 
   #--------------------------
@@ -296,6 +222,8 @@ inputs = {
   install_aws_vpc_cni_with_vpn        = false
   install_metrics_server              = true
   install_traefik                     = false
+  # Change (if true) setup default of default StorageClass from GP2 to GP3.
+  install_storage_class_gp3           = true
 
   # For create traefik ingress, the parameters 'install_aws_loadbalancer_controller' and 'install_traefik' must have 'true' value.
   create_traefik_ingress              = false
@@ -314,8 +242,8 @@ inputs = {
   velero_s3_bucket_name   = "CHANGE_HERE"
   velero_s3_bucket_prefix = "CHANGE_HERE"
   velero_s3_bucket_region = "CHANGE_HERE"
-  velero_deploy_restic    = false
-  velero_default_restic   = false
+  velero_deploy_fsbackup  = false
+  velero_default_fsbackup = false
   velero_snapshot_enabled = false
 
   #--------------------------

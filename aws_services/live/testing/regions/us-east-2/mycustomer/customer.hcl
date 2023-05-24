@@ -34,7 +34,7 @@ locals {
 
   # IP Address that can access the Kubernetes cluster
   cluster_endpoint_public_access_cidrs = [
-    "187.106.34.175/32",
+    "187.106.32.9/32",
   ]
 
   key_name           = "key-${local.suffix1}"

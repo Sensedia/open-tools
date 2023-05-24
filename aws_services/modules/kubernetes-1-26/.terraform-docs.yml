@@ -30,7 +30,7 @@ content: |-
 
   # About
   
-  Terraform module to create Kubernetes cluster in AWS-EKS 1.25 with self managed nodes, AWS managed nodes and Karpenter nodes.
+  Terraform module to create Kubernetes cluster in AWS-EKS 1.26 with self managed nodes, AWS managed nodes and Karpenter nodes.
 
   1. This directory contains the files:<br>
   * ``variables.tf`` => where you can define the values of the variables used by ``main.tf``.<br>
@@ -63,10 +63,13 @@ content: |-
 
   =====================
 
-  NOTE: Developed using Terraform 1.4.x syntax.
+  NOTE: Developed using Terraform 1.4.x syntax and tested with Terragrunt 0.45.x.
 
   =====================
 
+  * Configure AWS access credentials using IAM Roles.
+
+  * Install tfenv and tgenv commands.
 
   ## How to use
 

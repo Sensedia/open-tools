@@ -4,7 +4,7 @@
 module "eks" {
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.12"
+  version = "~> 19.14"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
@@ -17,10 +17,10 @@ module "eks" {
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
 
-  cluster_endpoint_public_access        = var.cluster_endpoint_public_access
-  cluster_endpoint_public_access_cidrs  = var.cluster_endpoint_public_access_cidrs
-  cluster_endpoint_private_access       = var.cluster_endpoint_private_access
-  cluster_additional_security_group_ids = var.cluster_additional_security_group_ids
+  cluster_endpoint_public_access          = var.cluster_endpoint_public_access
+  cluster_endpoint_public_access_cidrs    = var.cluster_endpoint_public_access_cidrs
+  cluster_endpoint_private_access         = var.cluster_endpoint_private_access
+  cluster_additional_security_group_ids   = var.cluster_additional_security_group_ids
   cluster_security_group_additional_rules = merge(
     {
       ingress_vpc_cidr_block_all = {
@@ -38,7 +38,8 @@ module "eks" {
   # Required for Karpenter role below
   enable_irsa = true
 
-  node_security_group_additional_rules = merge(
+  node_security_group_enable_recommended_rules = var.node_security_group_enable_recommended_rules
+  node_security_group_additional_rules         = merge(
     {
       ingress_vpc_cidr_block_all = {
         description = "CIDR of the VPC to node all ports/protocols"
@@ -48,23 +49,24 @@ module "eks" {
         type        = "ingress"
         cidr_blocks = var.vpc_cidr_block
       }
-      ingress_self_all = {
-        description = "Node to node all ports/protocols"
-        protocol    = "-1"
-        from_port   = 0
-        to_port     = 0
-        type        = "ingress"
-        self        = true
-      }
-      egress_all = {
-        description      = "Node all egress"
-        protocol         = "-1"
-        from_port        = 0
-        to_port          = 0
-        type             = "egress"
-        cidr_blocks      = ["0.0.0.0/0"]
-        ipv6_cidr_blocks = ["::/0"]
-      }
+      ### This rules are deprecated because of new variable 'node_security_group_enable_recommended_rules'
+      # ingress_self_all = {
+      #   description = "Node to node all ports/protocols"
+      #   protocol    = "-1"
+      #   from_port   = 0
+      #   to_port     = 0
+      #   type        = "ingress"
+      #   self        = true
+      # }
+      # egress_all = {
+      #   description      = "Node all egress"
+      #   protocol         = "-1"
+      #   from_port        = 0
+      #   to_port          = 0
+      #   type             = "egress"
+      #   cidr_blocks      = ["0.0.0.0/0"]
+      #   ipv6_cidr_blocks = ["::/0"]
+      # }
     },
     var.node_security_group_additional_rules
   )
@@ -93,6 +95,11 @@ module "eks" {
 
   eks_managed_node_group_defaults = merge(
     {
+      enable_monitoring  = false
+      capacity_rebalance = true
+      iam_role_additional_policies = {
+        "AmazonSSMManagedInstanceCore" = "arn:${local.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      }
       metadata_options = {
         http_endpoint               = "enabled"
         http_tokens                 = "required"
@@ -120,7 +127,6 @@ module "eks" {
     {}
   )
 
-
   # Trying to implement case conditional statement native of other programing languages
   # See implementation of case_result variable in locals.tf file
   eks_managed_node_groups = merge(
@@ -142,8 +148,8 @@ module "eks" {
           iam_role_attach_cni_policy   = true
           iam_role_additional_policies = {
             # Required by Karpenter
-            AmazonSSMManagedInstanceCore = "arn:${local.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            CloudWatchAgentServerPolicy  = "arn:${local.partition}:iam::aws:policy/CloudWatchAgentServerPolicy",
+            "AmazonSSMManagedInstanceCore" = "arn:${local.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "CloudWatchAgentServerPolicy"  = "arn:${local.partition}:iam::aws:policy/CloudWatchAgentServerPolicy",
           }
 
           tags = {

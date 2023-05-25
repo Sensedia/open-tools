@@ -122,9 +122,9 @@ variable "cluster_name" {
 }
 
 variable "cluster_version" {
-  description = "Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.26`)."
+  description = "Kubernetes `<major>.<minor>` version to use for the EKS cluster (i.e.: `1.27`)."
   type        = string
-  default     = "1.26"
+  default     = "1.27"
 }
 
 variable "control_plane_subnet_ids" {

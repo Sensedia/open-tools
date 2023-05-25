@@ -77,7 +77,7 @@ data "aws_eks_addon_version" "this" {
 # A version of helm chart maybe not compatible with custom CoreDNS container image.
 # See compatible list versions of custom CoreDNS container image using the command:
 #
-# K8S_VERSION='1.26'
+# K8S_VERSION='1.27'
 # aws eks describe-addon-versions --addon-name coredns --kubernetes-version $K8S_VERSION --query "addons[].addonVersions[].[addonVersion, compatibilities[].defaultVersion]" --output text
 #
 resource "helm_release" "coredns" {

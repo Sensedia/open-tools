@@ -32,6 +32,7 @@ Thanks to the Cloud Platform Team for their contribution to the terraform module
 * [Alan Arakaki](https://www.linkedin.com/in/alanarakaki/)
 * [Tiago Vilas Boas](https://www.linkedin.com/in/tavilasboas/)
 * [Lucas Santos](https://www.linkedin.com/in/lucas-vieira-dos-santos/)
+* [Fabiano Costa](https://www.linkedin.com/in/fabiano-costa/)
 * [Aécio Pires](https://www.linkedin.com/in/aeciopires/)
 
 # Requirements

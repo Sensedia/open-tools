@@ -27,7 +27,7 @@ resource "helm_release" "aws_efs_csi_driver" {
   name              = "aws-efs-csi-driver"
   repository        = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   chart             = "aws-efs-csi-driver"
-  version           = "2.4.3" # Install version 1.5.5 of aws efs-csi-driver. See new changes on release notes of application: https://github.com/kubernetes-sigs/aws-efs-csi-driver/releases
+  version           = "2.4.3" # Install version 1.5.6 of aws efs-csi-driver. See new changes on release notes of application: https://github.com/kubernetes-sigs/aws-efs-csi-driver/releases
   dependency_update = true
 
   values = [

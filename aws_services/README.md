@@ -26,6 +26,14 @@
 
 Create EKS Kubernetes cluster 1.27 using Terragrunt and Terraform code.
 
+Thanks to the Cloud Platform Team for their contribution to the terraform module, documentation and terragrunt.
+
+* [Danilo Rocha](https://www.linkedin.com/in/danilo-figueiredo-rocha/)
+* [Alan Arakaki](https://www.linkedin.com/in/alanarakaki/)
+* [Tiago Vilas Boas](https://www.linkedin.com/in/tavilasboas/)
+* [Lucas Santos](https://www.linkedin.com/in/lucas-vieira-dos-santos/)
+* [Aécio Pires](https://www.linkedin.com/in/aeciopires/)
+
 # Requirements
 
 * Configure the AWS Credentials and all install all packages and binaries following the instructions on the [REQUIREMENTS.md](../REQUIREMENTS.md) file.

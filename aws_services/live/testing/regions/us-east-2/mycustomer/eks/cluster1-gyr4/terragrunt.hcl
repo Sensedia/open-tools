@@ -31,7 +31,7 @@ locals {
 # working directory, into a temporary folder, and execute your Terraform commands in that folder.
 terraform {
   # Added double slash terragrunt: https://ftclausen.github.io/dev/infra/terraform-solving-the-double-slash-mystery/
-  source = "${get_repo_root()}/aws_services/modules//kubernetes-1-26"
+  source = "${get_repo_root()}/aws_services/modules//kubernetes-1-27"
 }
 
 dependencies {
@@ -69,7 +69,7 @@ inputs = {
   # using Karpenter, AWS Manage Node Group or Self Manage Node Group
   # using all components optionals, guest permitions and without using VPN
   #
-  # You can to use this file for to learn how to create EKS cluster using kubernetes 1.25.x
+  # You can to use this file for to learn how to create EKS cluster
   #-----------------------
 
 

@@ -24,7 +24,16 @@
 
 # About
 
-Create EKS Kubernetes cluster 1.25 using Terragrunt and Terraform code.
+Create EKS Kubernetes cluster 1.27 using Terragrunt and Terraform code.
+
+Thanks to the Cloud Platform Team for their contribution to the terraform module, documentation and terragrunt.
+
+* [Danilo Rocha](https://www.linkedin.com/in/danilo-figueiredo-rocha/)
+* [Alan Arakaki](https://www.linkedin.com/in/alanarakaki/)
+* [Tiago Vilas Boas](https://www.linkedin.com/in/tavilasboas/)
+* [Lucas Santos](https://www.linkedin.com/in/lucas-vieira-dos-santos/)
+* [Fabiano Costa](https://www.linkedin.com/in/fabiano-costa/)
+* [Aécio Pires](https://www.linkedin.com/in/aeciopires/)
 
 # Requirements
 
@@ -77,7 +86,7 @@ Terragrunt will forward almost all commands, arguments, and options directly to 
 │       │       └── region.hcl # Region configurations for Terragrunt code
 │       └── terragrunt.hcl # General Terragrunt code for manage state in S3 e lockID in DynamoDB
 ├── modules # Directory with Terraform modules
-│   └── kubernetes-1-25 # Terraform module for create EKS cluster
+│   └── kubernetes-1-27 # Terraform module for create EKS cluster
 └── README.md # This documentation
 ```
 

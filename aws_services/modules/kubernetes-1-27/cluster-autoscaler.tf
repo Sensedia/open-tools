@@ -33,7 +33,7 @@ resource "helm_release" "cluster_autoscaler" {
     replicaCount: 2
 
     image:
-      tag: v1.26.2
+      tag: v1.27.1
 
     priorityClassName: "system-cluster-critical"
 
